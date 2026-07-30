@@ -1,89 +1,89 @@
 # GOV-009 – Landing Zone Design
 
-| **Document ID** | GOV-009 |
-|-----------------|---------|
-| **Version** | 1.0 |
-| **Status** | Approved |
-| **Owner** | Cloud Platform Team |
-| **Audience** | Cloud Architects, Platform Engineers |
+| **Document ID**  | GOV-009                                                     |
+| ---------------- | ----------------------------------------------------------- |
+| **Version**      | 1.1                                                         |
+| **Status**       | Approved                                                    |
+| **Owner**        | Cloud Platform Team                                         |
+| **Audience**     | Enterprise Architects, Cloud Architects, Platform Engineers |
+| **Organization** | Mandara Global                                              |
+| **Program**      | OneCloud 2030                                               |
 
 ---
 
 # 1. Purpose
 
-This document describes the Landing Zone design for the Azure Enterprise Cloud Foundation.
+As part of the **OneCloud 2030** transformation program, **Mandara Global** is establishing an enterprise Azure Landing Zone to provide a secure, scalable, and standardized cloud foundation for current and future business workloads.
 
-The Landing Zone provides a standardized Azure platform that enables secure, governed and scalable cloud deployments.
+This document defines the Landing Zone design of the Azure Enterprise Cloud Foundation. The objective is to provide a production-ready platform that enables consistent governance, networking, security, identity, monitoring, and Infrastructure as Code across the organization.
 
 ---
 
 # 2. Design Principles
 
-The Landing Zone is designed according to the following principles:
+The Landing Zone is built on the following principles:
 
-- Governance by design
-- Secure by default
-- Standardized deployments
-- Infrastructure as Code
-- Scalable architecture
+* Enterprise-scale governance
+* Secure by default
+* Platform standardization
+* Infrastructure as Code
+* Operational excellence
+* Scalability by design
 
 ---
 
 # 3. Landing Zone Architecture
 
-```text
+```text id="8s0pk7"
 Tenant Root
 │
 ├── Platform
-│     ├── Identity Subscription
-│     ├── Connectivity Subscription
-│     └── Management Subscription
+│     ├── Identity
+│     ├── Connectivity
+│     └── Management
 │
 └── Landing Zones
-      ├── Production Subscription
-      ├── Non-Production Subscription
-      └── Sandbox Subscription
+      ├── Production
+      ├── Non-Production
+      └── Sandbox
 ```
-
-Platform subscriptions provide shared services.
-
-Landing Zone subscriptions host business workloads.
 
 ---
 
-# 4. Platform Capabilities
+# 4. Platform Components
 
-| Capability | Purpose |
-|------------|---------|
-| Identity | Authentication and identity services |
-| Connectivity | Shared networking services |
-| Management | Monitoring, governance and operational services |
+| Component         | Purpose                                                           |
+| ----------------- | ----------------------------------------------------------------- |
+| **Identity**      | Microsoft Entra ID integration and identity services              |
+| **Connectivity**  | Shared networking, Azure Firewall, DNS, and connectivity services |
+| **Management**    | Monitoring, logging, backup, governance, and operational services |
+| **Landing Zones** | Business applications and workload subscriptions                  |
 
 ---
 
 # 5. Governance Integration
 
-The Landing Zone integrates the governance model defined in previous documents:
+The Landing Zone integrates the following governance capabilities:
 
-- Management Groups
-- Subscription Strategy
-- Resource Organization
-- Naming Convention
-- Tagging Strategy
-- Role-Based Access Control (RBAC)
-- Azure Policy
-
-These components work together to provide a secure and standardized Azure environment.
+* Management Groups
+* Azure Policy
+* Role-Based Access Control (RBAC)
+* Naming Convention
+* Tagging Strategy
+* Infrastructure as Code
+* Continuous Compliance
 
 ---
 
-# 6. Design Benefits
+# 6. Expected Benefits
 
-- Standardized cloud platform
-- Consistent governance
-- Secure workload onboarding
-- Simplified operations
-- Scalable foundation for future growth
+* Secure enterprise cloud platform
+* Consistent governance across all subscriptions
+* Simplified operations
+* Standardized deployments
+* Improved compliance
+* Scalable cloud adoption
+* Faster onboarding of new workloads
 
 ---
 
@@ -91,31 +91,32 @@ These components work together to provide a secure and standardized Azure enviro
 
 ## Decision
 
-Adopt a standardized Landing Zone architecture based on shared platform services and dedicated workload subscriptions.
+Mandara Global has decided to adopt an Azure Landing Zone architecture based on Microsoft Cloud Adoption Framework (CAF) and Azure Landing Zone design principles as the strategic cloud platform for the **OneCloud 2030** transformation program.
 
 ## Rationale
 
-Separating shared platform capabilities from business workloads improves governance, security and operational scalability while keeping the architecture simple.
+The Azure Landing Zone provides a proven enterprise architecture that combines governance, security, networking, identity, and operational management into a single, standardized platform. This approach enables Mandara Global to accelerate cloud adoption while maintaining consistency, security, and operational excellence across all business units and future workloads.
 
 ---
 
 # 8. Related Documents
 
-| Document | Description |
-|----------|-------------|
-| GOV-002 | Management Groups Strategy |
-| GOV-003 | Subscription Strategy |
-| GOV-004 | Resource Organization Strategy |
-| GOV-005 | Naming Convention |
-| GOV-006 | RBAC Strategy |
-| GOV-007 | Azure Policy Strategy |
-| GOV-008 | Tagging Strategy |
+| Document | Description                    |
+| -------- | ------------------------------ |
+| GOV-001  | Cloud Governance Strategy      |
+| GOV-002  | Management Groups Strategy     |
+| GOV-003  | Subscription Strategy          |
+| GOV-004  | Resource Organization Strategy |
+| GOV-005  | Naming Convention              |
+| GOV-006  | RBAC Strategy                  |
+| GOV-007  | Azure Policy Strategy          |
+| GOV-008  | Tagging Strategy               |
 
 ---
 
 # Key Takeaways
 
-- The Landing Zone provides a governed Azure foundation.
-- Shared platform services are isolated from business workloads.
-- Governance is integrated through Management Groups, RBAC, Azure Policy and tagging.
-- The architecture is designed for scalability, security and operational consistency.
+* The Azure Landing Zone is the enterprise cloud foundation for Mandara Global.
+* Governance, security, networking, identity, and operations are integrated into a unified platform architecture.
+* Infrastructure is provisioned through Infrastructure as Code to ensure consistency and repeatability.
+* The Landing Zone enables the **OneCloud 2030** transformation program by providing a secure, scalable, and production-ready cloud operating model aligned with Microsoft best practices.

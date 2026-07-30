@@ -1,84 +1,85 @@
 # GOV-006 – RBAC Strategy
 
-| **Document ID** | GOV-006 |
-|-----------------|---------|
-| **Version** | 1.0 |
-| **Status** | Approved |
-| **Owner** | Cloud Platform Team |
-| **Audience** | Cloud Architects, Platform Engineers, Security Engineers |
+| **Document ID**  | GOV-006                                                  |
+| ---------------- | -------------------------------------------------------- |
+| **Version**      | 1.1                                                      |
+| **Status**       | Approved                                                 |
+| **Owner**        | Cloud Platform Team                                      |
+| **Audience**     | Cloud Architects, Security Engineers, Platform Engineers |
+| **Organization** | Mandara Global                                           |
+| **Program**      | OneCloud 2030                                            |
 
 ---
 
 # 1. Purpose
 
-This document defines the Role-Based Access Control (RBAC) strategy for the Azure Enterprise Cloud Foundation.
+As part of the **OneCloud 2030** transformation program, **Mandara Global** is implementing a standardized Role-Based Access Control (RBAC) model to secure access to Azure resources while enabling efficient collaboration across platform and application teams.
 
-The objective is to ensure secure and controlled access to Azure resources based on the principle of least privilege.
+This document defines the RBAC strategy for the Azure Enterprise Cloud Foundation. The objective is to establish consistent authorization practices based on the Principle of Least Privilege, ensuring that users receive only the permissions required to perform their responsibilities.
 
 ---
 
-# 2. RBAC Principles
+# 2. Design Principles
 
 The RBAC strategy follows these principles:
 
-- Apply the Principle of Least Privilege.
-- Assign permissions to groups rather than individual users.
-- Use Azure built-in roles whenever possible.
-- Grant permissions at the highest appropriate scope.
-- Review access permissions regularly.
+* Apply the Principle of Least Privilege.
+* Assign permissions using Azure Entra ID groups whenever possible.
+* Grant permissions at the highest appropriate scope.
+* Avoid assigning permissions directly to individual users.
+* Separate operational responsibilities through role delegation.
 
 ---
 
-# 3. Access Model
+# 3. RBAC Hierarchy
 
-```text
-Users
-   │
-   ▼
-Microsoft Entra ID Groups
-   │
-   ▼
-Azure RBAC Roles
-   │
-   ▼
-Management Groups
-Subscriptions
-Resource Groups
-Resources
+```text id="b1h72d"
+Management Group
+        │
+        ▼
+Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Resource
 ```
 
----
-
-# 4. Administrative Roles
-
-| Role | Responsibility |
-|------|----------------|
-| **Platform Administrators** | Manage the Azure platform and shared services. |
-| **Network Administrators** | Manage networking and connectivity resources. |
-| **Security Administrators** | Manage security policies and identity services. |
-| **Application Teams** | Deploy and manage application resources. |
-| **Readers** | Read-only access for auditing and reporting. |
+Permissions are inherited through the Azure resource hierarchy unless explicitly overridden.
 
 ---
 
-# 5. Scope Assignment
+# 4. Standard Roles
 
-| Scope | Typical Assignment |
-|-------|--------------------|
-| Management Group | Platform governance roles |
-| Subscription | Platform and application administrators |
-| Resource Group | Application teams |
-| Resource | Exceptional cases only |
+| Role                          | Responsibility                                               |
+| ----------------------------- | ------------------------------------------------------------ |
+| **Owner**                     | Full administrative control, including access management.    |
+| **Contributor**               | Manage Azure resources without modifying access permissions. |
+| **Reader**                    | Read-only access to Azure resources.                         |
+| **User Access Administrator** | Manage RBAC assignments without modifying resources.         |
+
+---
+
+# 5. RBAC Assignment Strategy
+
+| Scope            | Typical Assignment               |
+| ---------------- | -------------------------------- |
+| Management Group | Platform Administrators          |
+| Subscription     | Platform Operations Team         |
+| Resource Group   | Application or Service Owners    |
+| Resource         | Exception-based assignments only |
 
 ---
 
 # 6. Design Benefits
 
-- Improved security
-- Simplified administration
-- Consistent access management
-- Reduced operational risk
-- Scalable permission model
+* Improved security
+* Simplified administration
+* Centralized identity management
+* Reduced operational risk
+* Scalable authorization model
+* Consistent access governance
 
 ---
 
@@ -86,28 +87,29 @@ Resources
 
 ## Decision
 
-Use Microsoft Entra ID groups with Azure RBAC built-in roles to manage access across the platform.
+Mandara Global has decided to implement Azure Role-Based Access Control (RBAC) using Microsoft Entra ID groups and the Principle of Least Privilege across the Azure Enterprise Cloud Foundation.
 
 ## Rationale
 
-Group-based access management improves security, simplifies administration and reduces the risk of permission inconsistencies.
+A centralized RBAC model strengthens security, simplifies access administration, and ensures consistent authorization across all Azure environments. Group-based role assignments reduce administrative overhead, improve auditability, and support Mandara Global's enterprise governance objectives under the **OneCloud 2030** transformation program.
 
 ---
 
 # 8. Related Documents
 
-| Document | Description |
-|----------|-------------|
-| GOV-001 | Cloud Governance Strategy |
-| GOV-002 | Management Groups Strategy |
-| GOV-003 | Subscription Strategy |
-| GOV-007 | Azure Policy Strategy |
+| Document | Description                |
+| -------- | -------------------------- |
+| GOV-001  | Cloud Governance Strategy  |
+| GOV-002  | Management Groups Strategy |
+| GOV-005  | Naming Convention          |
+| GOV-007  | Azure Policy Strategy      |
+| GOV-008  | Tagging Strategy           |
 
 ---
 
 # Key Takeaways
 
-- Access is granted through Microsoft Entra ID groups.
-- Permissions follow the Principle of Least Privilege.
-- Azure built-in roles are preferred over custom roles.
-- RBAC assignments are applied at the highest appropriate scope.
+* Access to Azure resources is governed through Azure RBAC.
+* Permissions are assigned to Microsoft Entra ID groups rather than individual users whenever possible.
+* The Principle of Least Privilege is applied consistently across all scopes.
+* The RBAC strategy supports Mandara Global's secure and scalable cloud operating model as part of the **OneCloud 2030** transformation program.
