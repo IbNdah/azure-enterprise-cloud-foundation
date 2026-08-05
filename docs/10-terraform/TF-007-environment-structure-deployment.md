@@ -118,3 +118,9 @@ The project adopts a layered deployment model:
 - Environment folders define deployment-specific settings.
 
 This structure supports enterprise-scale Terraform projects while remaining simple and maintainable.
+
+---
+
+## Next Step
+
+**TF-008 – Terraform Bootstrap Strategy**
