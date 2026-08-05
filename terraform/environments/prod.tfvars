@@ -1,0 +1,3 @@
+environment = "prod"
+
+location = "westeurope"

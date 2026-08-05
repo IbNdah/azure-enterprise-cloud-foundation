@@ -24,13 +24,21 @@ This project intentionally focuses on a pragmatic enterprise implementation rath
 # Architecture Overview
 
 ```text
-Terraform
-│
-├── Backend
-├── Modules
-├── Platform
-├── Landing Zones
-└── Environments
+terraform/
+
+├── backend/
+├── environments/
+│   ├── dev.tfvars
+│   ├── test.tfvars
+│   └── prod.tfvars
+├── landingzones/
+├── modules/
+├── platform/
+├── locals.tf
+├── main.tf
+├── providers.tf
+├── variables.tf
+└── versions.tf
 ```
 
 The repository separates reusable infrastructure modules from platform resources and application landing zones. This organization improves maintainability, scalability, and future extensibility.

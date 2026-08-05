@@ -23,13 +23,20 @@ A well-structured Terraform repository improves readability, maintainability, an
 
 ```text
 terraform/
-│
+
 ├── backend/
 ├── environments/
+│   ├── dev.tfvars
+│   ├── test.tfvars
+│   └── prod.tfvars
 ├── landingzones/
 ├── modules/
 ├── platform/
-└── README.md
+├── locals.tf
+├── main.tf
+├── providers.tf
+├── variables.tf
+└── versions.tf
 ```
 
 Each directory has a single responsibility, reducing coupling and simplifying maintenance.

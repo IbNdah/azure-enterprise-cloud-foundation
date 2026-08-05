@@ -5,7 +5,7 @@
 | **Document ID**  | TF-002                        |
 | **Title**        | Terraform Remote State        |
 | **Status**       | Accepted                      |
-| **Date**         | 2026-08-02                    |
+| **Date**         | 2026-08-04                    |
 | **Authors**      | Cloud Architecture Team       |
 | **Program**      | OneCloud 2030                 |
 | **Organization** | Mandara Global                |
@@ -15,9 +15,9 @@
 
 # Executive Summary
 
-Terraform state is a critical component of Infrastructure as Code. Rather than storing the state file locally, this project uses an Azure Storage Account as a remote backend to enable secure, consistent, and collaborative infrastructure management.
+Terraform state is a critical component of Infrastructure as Code. Rather than storing the state file locally, this project uses an Azure Storage Account as a remote backend to provide secure, centralized and consistent infrastructure management.
 
-The remote state configuration ensures that infrastructure changes are tracked centrally while supporting future CI/CD integration.
+The remote backend establishes a single source of truth for Terraform deployments while supporting collaboration and future CI/CD integration.
 
 ---
 
@@ -25,16 +25,34 @@ The remote state configuration ensures that infrastructure changes are tracked c
 
 ```text
 Terraform
-     │
-     ▼
+
+↓
+
+backend.hcl
+
+↓
+
 Azure Storage Account
-     │
-     └── Blob Container
-             │
-             └── terraform.tfstate
+
+↓
+
+Blob Container
+
+↓
+
+dev.terraform.tfstate
 ```
 
-The remote backend stores the Terraform state file in Azure Blob Storage, providing a single source of truth for infrastructure deployments.
+The Terraform state is stored in Azure Blob Storage, ensuring that infrastructure state remains centralized, persistent and independent of local developer workstations.
+
+### Backend Resources
+
+| **Resource** | **Name** |
+|--------------|----------|
+| Resource Group | `rg-mandara-tfstate-01` |
+| Storage Account | `stmandaratfstate01` |
+| Blob Container | `tfstate` |
+| State File | `dev.terraform.tfstate` |
 
 ---
 
@@ -43,10 +61,10 @@ The remote backend stores the Terraform state file in Azure Blob Storage, provid
 | **Decision** | **Rationale** |
 |--------------|---------------|
 | Azure Storage Account | Native Azure backend for Terraform |
-| Blob Container | Centralized storage for state files |
+| Blob Container | Centralized storage for Terraform state |
 | Remote Backend | Eliminates dependency on local state files |
-| One state per environment | Keeps Dev, Test and Production isolated |
-| Backend configuration separated | Simplifies maintenance and future automation |
+| One state file per environment | Each environment maintains its own Terraform state (`dev.terraform.tfstate`, `test.terraform.tfstate`, `prod.terraform.tfstate`) |
+| Single backend configuration file | Current project scope does not justify multiple backend configuration files |
 
 ---
 
@@ -54,20 +72,58 @@ The remote backend stores the Terraform state file in Azure Blob Storage, provid
 
 | **Benefits** | **Trade-offs** |
 |--------------|----------------|
-| Centralized state management | Requires backend initialization before deployment |
-| Better collaboration | Azure resources must exist before first Terraform run |
-| Reduced risk of state inconsistency | Slightly more initial configuration |
-| Ready for CI/CD pipelines | |
+| Centralized state management | Backend infrastructure must exist before the first deployment |
+| Better collaboration | Initial backend configuration is required |
+| Reduced risk of state inconsistency | |
+| Ready for future CI/CD integration | |
+
+---
+
+# Architecture Decision
+
+The project intentionally uses a single backend configuration file.
+
+```text
+terraform/
+
+backend/
+└── backend.hcl
+```
+
+Although large enterprise platforms often maintain dedicated backend configuration files for Development, Test and Production, this project intentionally adopts a simpler approach.
+
+### Rationale
+
+- The platform currently manages a single Azure subscription.
+- A single Azure Storage Account hosts the Terraform backend.
+- Additional backend configuration files were evaluated but intentionally deferred.
+- Introducing multiple backend configuration files at this stage would increase complexity without providing additional architectural value.
+
+The project follows the guiding architecture principle:
+
+> **Introduce complexity only when justified by a real business or technical requirement.**
+
+If the platform evolves towards multiple Azure subscriptions, multiple backend infrastructures or independent platform teams, dedicated backend configuration files can be introduced without redesigning the Terraform architecture.
+
+---
+
+# Bootstrap Consideration
+
+The Terraform backend is created during an initial bootstrap phase and is intentionally managed outside of the platform deployment.
+
+This avoids a circular dependency where Terraform would need an existing backend in order to create the backend itself.
+
+The bootstrap process is performed only once before the first platform deployment.
 
 ---
 
 # Key Takeaways
 
 - Terraform state is stored centrally in Azure Blob Storage.
-- Remote state improves consistency and collaboration.
-- Each environment maintains an independent state file.
-- The backend design supports future automation pipelines.
 - Local state files are intentionally avoided.
+- Each environment uses an independent Terraform state file.
+- A single backend configuration file is sufficient for the current project scope.
+- The backend architecture is designed to evolve without impacting the Terraform modules.
 
 ---
 
@@ -76,8 +132,8 @@ The remote backend stores the Terraform state file in Azure Blob Storage, provid
 - Terraform AzureRM Backend
 - Microsoft Cloud Adoption Framework (CAF)
 
+---
+
 ## Next Step
 
 **TF-003 – Terraform Repository Architecture**
-
-
