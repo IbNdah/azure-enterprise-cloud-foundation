@@ -1,9 +1,15 @@
-module "resource_group" {
+module "management_resource_group" {
 
-  source = "../../modules/resource_group"
-  name = "rg-platform-${var.environment}-001"
+  source = "../../modules/resource-group"
 
+  name     = var.resource_group_name
   location = var.location
-  tags = var.tags
 
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Management"
+    }
+  )
 }
