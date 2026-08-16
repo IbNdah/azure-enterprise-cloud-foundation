@@ -1,54 +1,55 @@
 ##################################################
-# Platform Management
+# Security Resource Group
 ##################################################
 
-module "management" {
-  source = "./platform/management"
+module "security_resource_group" {
+  source = "../../modules/resource-group"
 
-  resource_group_name = var.management_resource_group_name
-  location            = var.location
-  tags                = var.tags
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.tags
 }
 
 ##################################################
-# Platform Connectivity
+# Platform Security - Key Vault
 ##################################################
 
-module "connectivity" {
-  source = "./platform/connectivity"
+module "platform_key_vault" {
+  source = "../../modules/key-vault"
 
-  resource_group_name  = var.management_resource_group_name
-  virtual_network_name = "vnet-platform-${var.environment}-001"
+  name                = var.key_vault_name
+  resource_group_name = module.security_resource_group.name
+  location            = var.location
 
-  location      = var.location
-  address_space = ["10.0.0.0/16"]
+  tenant_id = var.tenant_id
+  sku_name  = var.sku_name
 
-  subnets = {
-    management = {
-      address_prefixes = ["10.0.1.0/24"]
-    }
-
-    shared = {
-      address_prefixes = ["10.0.2.0/24"]
-    }
-  }
+  purge_protection_enabled   = var.purge_protection_enabled
+  soft_delete_retention_days = var.soft_delete_retention_days
 
   tags = var.tags
 }
 
 ##################################################
-# Platform Security
+# Key Vault Private Endpoint
 ##################################################
 
-module "security" {
-  source = "./platform/security"
+module "platform_key_vault_private_endpoint" {
+  source = "../../modules/private-endpoint"
 
-  resource_group_name        = module.management.resource_group_name
-  private_endpoint_subnet_id = module.connectivity.private_endpoint_subnet_id
+  name                = "${var.key_vault_name}-pep"
+  location            = var.location
+  resource_group_name = module.security_resource_group.name
 
-  location       = var.location
-  tenant_id      = var.tenant_id
-  key_vault_name = var.key_vault_name
+  subnet_id = var.private_endpoint_subnet_id
+
+  private_service_connection_name = "${var.key_vault_name}-psc"
+
+  private_connection_resource_id = module.platform_key_vault.id
+
+  subresource_names = [
+    "vault"
+  ]
 
   tags = var.tags
 }

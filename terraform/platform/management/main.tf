@@ -4,12 +4,5 @@ module "management_resource_group" {
 
   name     = var.resource_group_name
   location = var.location
-
-  tags = merge(
-    local.common_tags,
-    var.tags,
-    {
-      Capability = "Management"
-    }
-  )
+  tags     = var.tags
 }

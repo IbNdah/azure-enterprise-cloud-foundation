@@ -14,6 +14,12 @@ output "subnet_ids" {
   value = module.hub_subnets.subnet_ids
 }
 
+output "private_endpoint_subnet_id" {
+  description = "Subnet ID used for Private Endpoints."
+
+  value = module.hub_subnets.subnet_ids["shared"]
+}
+
 output "network_security_group_id" {
   value = module.hub_network_security_group.id
 }

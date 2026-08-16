@@ -2,7 +2,7 @@
 # General
 ##################################################
 variable "resource_group_name" {
-  description = "Management Resource Group name."
+  description = "Management Platform Resource Group name."
   type        = string
 }
 

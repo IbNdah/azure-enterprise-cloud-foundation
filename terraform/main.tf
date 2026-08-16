@@ -7,7 +7,14 @@ module "management" {
 
   resource_group_name = var.management_resource_group_name
   location            = var.location
-  tags                = var.tags
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Management"
+    }
+  )
 }
 
 ##################################################
@@ -17,7 +24,7 @@ module "management" {
 module "connectivity" {
   source = "./platform/connectivity"
 
-  resource_group_name  = var.management_resource_group_name
+  resource_group_name  = var.connectivity_resource_group_name
   virtual_network_name = "vnet-platform-${var.environment}-001"
 
   location      = var.location
@@ -33,7 +40,13 @@ module "connectivity" {
     }
   }
 
-  tags = var.tags
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Connectivity"
+    }
+  )
 }
 
 ##################################################
@@ -43,12 +56,19 @@ module "connectivity" {
 module "security" {
   source = "./platform/security"
 
-  resource_group_name        = module.management.resource_group_name
-  private_endpoint_subnet_id = module.connectivity.private_endpoint_subnet_id
+  resource_group_name = var.security_resource_group_name
+  location            = var.location
 
-  location       = var.location
   tenant_id      = var.tenant_id
   key_vault_name = var.key_vault_name
 
-  tags = var.tags
+  private_endpoint_subnet_id = module.connectivity.private_endpoint_subnet_id
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Security"
+    }
+  )
 }

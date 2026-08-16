@@ -8,14 +8,7 @@ module "connectivity_resource_group" {
 
   name     = var.resource_group_name
   location = var.location
-
-  tags = merge(
-    local.common_tags,
-    var.tags,
-    {
-      Capability = "Connectivity"
-    }
-  )
+  tags     = var.tags
 }
 
 ##################################################
@@ -31,14 +24,7 @@ module "hub_virtual_network" {
   resource_group_name = module.connectivity_resource_group.name
 
   address_space = var.address_space
-
-  tags = merge(
-    local.common_tags,
-    var.tags,
-    {
-      Capability = "Connectivity"
-    }
-  )
+  tags          = var.tags
 }
 
 ##################################################
@@ -66,12 +52,5 @@ module "hub_network_security_group" {
   name                = "${var.virtual_network_name}-nsg"
   location            = var.location
   resource_group_name = module.connectivity_resource_group.name
-
-  tags = merge(
-    local.common_tags,
-    var.tags,
-    {
-      Capability = "Connectivity"
-    }
-  )
+  tags                = var.tags
 }
