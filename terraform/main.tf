@@ -72,3 +72,43 @@ module "security" {
     }
   )
 }
+
+##################################################
+# Platform Operations
+##################################################
+
+module "operations" {
+  source = "./platform/operations"
+
+  resource_group_name = var.operations_resource_group_name
+  location            = var.location
+  common_tags         = local.common_tags
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Operations"
+    }
+  )
+}
+
+##################################################
+# Platform Identity
+##################################################
+
+module "identity" {
+  source = "./platform/identity"
+
+  resource_group_name = var.identity_resource_group_name
+  location            = var.location
+  common_tags         = local.common_tags
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Capability = "Identity"
+    }
+  )
+}
