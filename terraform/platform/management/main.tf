@@ -26,7 +26,7 @@ module "management_log_analytics" {
 }
 
 ##################################################
-# Policy Definitions
+# Policy Definitions - Allowed Locations
 ##################################################
 module "allowed_locations_policy" {
   source = "../../modules/policies"
@@ -66,7 +66,7 @@ module "allowed_locations_policy" {
   })
 
   ##################################################
-  # Policy Assignments
+  # Policy Assignments - Allowed Locations
   ##################################################
   assignment_name         = "assign-allowed-locations"
   assignment_display_name = "Allowed resource locations"
@@ -78,4 +78,44 @@ module "allowed_locations_policy" {
       value = var.allowed_locations
     }
   })
+}
+
+##################################################
+# Policy Definition - Required Tags
+##################################################
+module "required_tags_policy" {
+  source = "../../modules/policies"
+
+  name         = "pol-required-tags"
+  display_name = "Required resource tags"
+  description  = "Ensures that all resources have the required tags."
+
+  policy_rule = jsonencode({
+    if = {
+      anyOf = [
+        {
+          field  = "tags['Project']"
+          exists = "false"
+        },
+        {
+          field  = "tags['ManagedBy']"
+          exists = "false"
+        }
+      ]
+    }
+
+    then = {
+      effect = "deny"
+    }
+  })
+
+  ##################################################
+  # Policy Assignment - Required Tags
+  ##################################################
+  assignment_name         = "assign-required-tags"
+  assignment_display_name = "Required resource tags"
+
+  subscription_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+
+  assignment_parameters = jsonencode({})
 }
