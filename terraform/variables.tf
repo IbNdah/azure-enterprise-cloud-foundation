@@ -81,3 +81,11 @@ variable "monitor_action_group_short_name" {
   description = "Operations Monitor Action Group short name."
   type        = string
 }
+
+##################################################
+# Policy Definitions
+##################################################
+variable "allowed_locations" {
+  description = "Approved Azure regions for resource deployment."
+  type        = list(string)
+}

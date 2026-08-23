@@ -8,6 +8,7 @@ module "management" {
   resource_group_name = var.management_resource_group_name
   location            = var.location
   log_analytics_name  = var.log_analytics_name
+  allowed_locations   = var.allowed_locations
 
   tags = merge(
     local.common_tags,

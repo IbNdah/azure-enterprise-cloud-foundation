@@ -22,3 +22,7 @@ variable "log_analytics_name" {
   type        = string
 }
 
+variable "allowed_locations" {
+  description = "Approved Azure regions for resource deployment."
+  type        = list(string)
+}
