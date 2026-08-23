@@ -81,9 +81,10 @@ module "security" {
 module "operations" {
   source = "./platform/operations"
 
-  resource_group_name = var.operations_resource_group_name
-  location            = var.location
-  common_tags         = local.common_tags
+  resource_group_name             = var.operations_resource_group_name
+  location                        = var.location
+  monitor_action_group_name       = var.monitor_action_group_name
+  monitor_action_group_short_name = var.monitor_action_group_short_name
 
   tags = merge(
     local.common_tags,
@@ -103,7 +104,6 @@ module "identity" {
 
   resource_group_name = var.identity_resource_group_name
   location            = var.location
-  common_tags         = local.common_tags
 
   tags = merge(
     local.common_tags,

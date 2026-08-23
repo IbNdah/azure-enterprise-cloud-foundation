@@ -70,6 +70,14 @@ variable "log_analytics_name" {
 }
 
 ##################################################
-# Diagnostic Settings
+# Operations
 ##################################################
+variable "monitor_action_group_name" {
+  description = "Operations Monitor Action Group name."
+  type        = string
+}
 
+variable "monitor_action_group_short_name" {
+  description = "Operations Monitor Action Group short name."
+  type        = string
+}

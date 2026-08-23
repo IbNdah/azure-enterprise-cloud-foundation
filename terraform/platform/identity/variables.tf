@@ -8,11 +8,6 @@ variable "location" {
   type        = string
 }
 
-variable "common_tags" {
-  description = "Centralized enterprise metadata."
-  type        = map(string)
-}
-
 variable "tags" {
   description = "Capability-specific tags."
   type        = map(string)

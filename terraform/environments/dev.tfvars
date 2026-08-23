@@ -15,4 +15,14 @@ security_resource_group_name     = "rg-platform-security-dev-001"
 operations_resource_group_name   = "rg-platform-operations-dev-001"
 identity_resource_group_name     = "rg-platform-identity-dev-001"
 
+
+##################################################
+# Log Analytics
+##################################################
 log_analytics_name = "law-platform-dev-001"
+
+##################################################
+# Operations
+##################################################
+monitor_action_group_name       = "ag-platform-operations-dev-001"
+monitor_action_group_short_name = "ops-dev"
