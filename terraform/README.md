@@ -33,6 +33,19 @@ terraform/
 │   └── sandbox/
 │
 ├── modules/                # Reusable Azure resource modules
+│   ├── diagnostic-settings/
+│   ├── key-vault/
+│   ├── logs-analytics/
+│   ├── monitor/
+│   ├── network-security-group/
+│   ├── policies/
+│   ├── private-endpoint/
+│   ├── recovery-services/
+│   ├── resource-group/
+│   ├── role-assignment/
+│   ├── storage-account/
+│   ├── subnet/
+│   └── virtual-network/
 │
 ├── platform/               # Enterprise platform capabilities
 │   ├── management/
@@ -59,6 +72,17 @@ Each platform capability owns a dedicated Resource Group and its associated reso
 | Security | `rg-platform-security-<env>-001` |
 | Operations | `rg-platform-operations-<env>-001` |
 | Identity | `rg-platform-identity-<env>-001` |
+
+## Governance
+
+Governance controls are implemented within the Management capability using the reusable `policies` Terraform module.
+
+The foundation currently enforces:
+
+- Allowed resource locations
+- Required resource tags (`Project`, `ManagedBy`)
+
+Policy definitions and subscription-level assignments are managed exclusively through Terraform.
 
 ## Initialization
 
@@ -93,6 +117,7 @@ terraform plan
 - Platform capability ownership
 - Centralized enterprise metadata
 - Consistent resource tagging
+- Governance through policy-as-code
 - Clear separation of responsibilities
 
 ## Current Status
@@ -103,6 +128,6 @@ terraform plan
 | Management | ✅ |
 | Connectivity | ✅ |
 | Security | ✅ |
-| Operations | 🚧 |
-| Identity | ⏳ |
+| Operations | ✅ |
+| Identity | ✅ |
 | Landing Zones | ⏳ |
