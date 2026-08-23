@@ -60,3 +60,16 @@ variable "key_vault_name" {
   description = "Platform Key Vault name."
   type        = string
 }
+
+##################################################
+# Log Analytics
+##################################################
+variable "log_analytics_name" {
+  description = "Platform Log Analytics workspace name."
+  type        = string
+}
+
+##################################################
+# Diagnostic Settings
+##################################################
+

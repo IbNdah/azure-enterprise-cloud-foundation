@@ -14,3 +14,5 @@ connectivity_resource_group_name = "rg-platform-connectivity-dev-001"
 security_resource_group_name     = "rg-platform-security-dev-001"
 operations_resource_group_name   = "rg-platform-operations-dev-001"
 identity_resource_group_name     = "rg-platform-identity-dev-001"
+
+log_analytics_name = "law-platform-dev-001"

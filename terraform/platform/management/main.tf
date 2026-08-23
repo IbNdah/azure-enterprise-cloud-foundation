@@ -6,3 +6,13 @@ module "management_resource_group" {
   location = var.location
   tags     = var.tags
 }
+
+module "management_log_analytics" {
+  source = "../../modules/logs-analytics"
+
+  name                = var.log_analytics_name
+  location            = var.location
+  resource_group_name = module.management_resource_group.name
+
+  tags = var.tags
+}
