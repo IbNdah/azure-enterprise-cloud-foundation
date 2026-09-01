@@ -1,296 +1,335 @@
-# ADR-007 — Enterprise Monitoring & Observability Strategy
+# ADR-007 — Enterprise Monitoring and Observability Strategy
 
-| **Attribute**    | **Value**                                      |
-| ---------------- | ---------------------------------------------- |
-| **ADR ID**       | ADR-007                                        |
-| **Title**        | Enterprise Monitoring & Observability Strategy |
-| **Status**       | Accepted                                       |
-| **Date**         | 2026-07-31                                     |
-| **Authors**      | Cloud Architecture Team                        |
-| **Program**      | OneCloud 2030                                  |
-| **Organization** | Mandara Global                                 |
-| **Category**     | Operations & Observability                     |
+| Attribute | Value |
+|---|---|
+| **ADR ID** | ADR-007 |
+| **Title** | Enterprise Monitoring and Observability Strategy |
+| **Version** | 1.1 |
+| **Status** | Accepted |
+| **Date** | 2026-09-01 |
+| **Authors** | Cloud Architecture Team |
+| **Program** | OneCloud 2030 |
+| **Organization** | Mandara Global |
+| **Category** | Monitoring / Operations |
 
 ---
 
 # 1. Executive Summary
 
-As part of the **OneCloud 2030** transformation program, Mandara Global has decided to establish a centralized **Monitoring and Observability Strategy** for the Azure Enterprise Cloud Foundation.
+Mandara Global will provide centralized monitoring and observability capabilities as part of the Azure platform foundation.
 
-The strategy provides end-to-end visibility into platform health, application performance, infrastructure utilization, security events, and operational compliance through a unified monitoring platform.
+The approach is based on **Azure Monitor**, **Log Analytics** and diagnostic settings, with shared platform capabilities used where appropriate.
 
-This Architectural Decision Record documents the rationale for adopting a centralized observability model that enables proactive operations, faster incident response, and data-driven decision-making.
+The objective is to provide visibility into platform and workload health while avoiding unnecessary duplication of monitoring services.
+
+Monitoring is a shared **Platform Capability** and is not itself a Management Group.
 
 ---
 
 # 2. Business Context
 
-Mandara Global operates business-critical cloud services that require continuous availability and operational transparency.
+The enterprise cloud foundation requires consistent visibility into the health, performance and operational state of Azure resources.
 
-Historically, monitoring solutions were implemented independently by application teams, resulting in:
+Monitoring must support:
 
-* Fragmented operational visibility
-* Inconsistent alerting
-* Duplicate monitoring tools
-* Difficult incident investigation
-* Limited operational reporting
-* Inconsistent KPI measurement
+- platform operations;
+- workload operations;
+- incident investigation;
+- security and governance activities;
+- operational troubleshooting;
+- service health visibility.
 
-As part of the **OneCloud 2030** initiative, the organization requires a unified monitoring platform capable of supporting enterprise-scale operations across all Azure workloads.
+The model must remain scalable across Management Groups, subscriptions and Landing Zones.
 
 ---
 
 # 3. Problem Statement
 
-Without a centralized observability platform, operational teams cannot effectively monitor the health and performance of enterprise cloud services.
+Without a common monitoring approach, each Landing Zone could implement different logging, diagnostic and alerting patterns.
 
-This results in:
+This would make operational visibility inconsistent and increase administration effort.
 
-* Delayed incident detection
-* Increased Mean Time to Detect (MTTD)
-* Increased Mean Time to Recover (MTTR)
-* Limited root cause analysis
-* Poor operational visibility
-* Inconsistent dashboards
-* Difficult compliance reporting
-
-A standardized enterprise monitoring strategy is required to improve operational excellence and service reliability.
+The platform therefore requires a common monitoring foundation while allowing workloads to define additional monitoring requirements.
 
 ---
 
 # 4. Decision
 
-Mandara Global will implement a centralized monitoring platform based on **Azure Monitor**.
+Mandara Global will use the following monitoring model:
 
-The observability platform will include:
+| Component | Role |
+|---|---|
+| **Azure Monitor** | Central monitoring and metrics platform |
+| **Log Analytics Workspace** | Central log collection and analysis |
+| **Diagnostic Settings** | Route supported resource logs and metrics to monitoring destinations |
+| **Alerts** | Detect defined operational conditions |
+| **Action Groups** | Route alert notifications where required |
+| **Workbooks / Dashboards** | Provide operational views where useful |
 
-* Azure Monitor
-* Log Analytics Workspace
-* Azure Monitor Alerts
-* Azure Monitor Metrics
-* Azure Application Insights
-* Azure Managed Grafana
-* Azure Workbooks
-* Azure Service Health
-
-All enterprise workloads will publish logs, metrics, and telemetry to centralized monitoring services.
-
-Monitoring resources will be provisioned using Terraform and governed through standardized operational policies.
+Monitoring components should be centralized where this provides operational value, while workload-specific monitoring can remain within the workload boundary when justified.
 
 ---
 
-# 5. Decision Scope
+# 5. High-Level Monitoring Model
+
+```text
+                    Azure Platform
+                          │
+             ┌────────────┴────────────┐
+             │                         │
+             ▼                         ▼
+      Platform Resources         Landing Zone
+                                      │
+                                      ▼
+                                  Workloads
+             │                         │
+             └────────────┬────────────┘
+                          │
+                   Diagnostic Settings
+                          │
+                          ▼
+                Log Analytics Workspace
+                          │
+                          ▼
+                    Azure Monitor
+                     │          │
+                     ▼          ▼
+                   Alerts   Dashboards
+                     │
+                     ▼
+                Operations Team
+```
+
+The diagram represents the monitoring flow conceptually. Not every Azure resource necessarily sends every available signal to the same destination.
+
+---
+
+# 6. Logging and Diagnostics
+
+Supported Azure resources should use diagnostic settings where logging is required.
+
+Logs and metrics should be routed to the appropriate monitoring destination according to the resource and operational requirement.
+
+The platform provides a reusable diagnostic-settings capability to avoid repeated implementation patterns.
+
+The design should avoid collecting data that has no operational, security or governance value.
+
+---
+
+# 7. Monitoring Scope
+
+Monitoring is applied at different levels:
+
+| Scope | Example |
+|---|---|
+| **Platform** | Connectivity, identity, security and management services |
+| **Landing Zone** | Subscription and shared workload infrastructure |
+| **Workload** | Application-specific resources and services |
+
+Platform monitoring provides shared visibility.
+
+Landing Zones and workloads remain responsible for monitoring requirements that are specific to their services.
+
+---
+
+# 8. Alerts
+
+Alerts should be created for conditions that require operational attention.
+
+Typical categories include:
+
+- availability;
+- resource health;
+- capacity;
+- performance;
+- security-relevant events;
+- operational failures.
+
+Alerts should be actionable and avoid unnecessary notification noise.
+
+Not every metric requires an alert.
+
+---
+
+# 9. Security and Monitoring
+
+Monitoring is complementary to the enterprise security baseline.
+
+Security-relevant logs and signals should be retained and integrated with the appropriate security monitoring processes where required.
+
+Monitoring itself does not replace:
+
+- Azure Policy;
+- RBAC;
+- network controls;
+- security controls;
+- identity controls.
+
+It provides visibility into their operation and the state of the environment.
+
+---
+
+# 10. Decision Drivers
+
+| Driver | Reason |
+|---|---|
+| **Visibility** | Understand platform and workload health |
+| **Operations** | Support incident investigation and troubleshooting |
+| **Consistency** | Establish repeatable monitoring patterns |
+| **Scalability** | Support multiple subscriptions and Landing Zones |
+| **Cost Control** | Avoid unnecessary log collection and duplicated services |
+| **Governance** | Provide evidence and operational visibility |
+| **Security** | Support detection and investigation activities |
+
+---
+
+# 11. Architectural Principles
+
+| Principle | Application |
+|---|---|
+| **Central Monitoring Foundation** | Provide shared monitoring capabilities |
+| **Operational Relevance** | Collect data that has a defined purpose |
+| **Actionable Alerts** | Alert only when action is required |
+| **Appropriate Ownership** | Platform monitors platform services; workloads monitor workload-specific behavior |
+| **Reusable Patterns** | Use common Terraform modules |
+| **Controlled Retention** | Retain data according to operational and governance requirements |
+| **Scalable Design** | Support multiple subscriptions and Landing Zones |
+
+---
+
+# 12. Alternatives Considered
+
+| Option | Decision | Rationale |
+|---|---|---|
+| **Independent monitoring per subscription** | Rejected as default | Creates duplication and fragmented visibility |
+| **Central monitoring only** | Rejected | Does not cover all workload-specific requirements |
+| **Central foundation + workload-specific monitoring** | **Selected** | Balances consistency, ownership and flexibility |
+| **Collect all available logs** | Rejected | Unnecessary cost and operational noise |
+
+---
+
+# 13. Expected Benefits
+
+| Area | Benefit |
+|---|---|
+| Operations | Faster troubleshooting and incident analysis |
+| Visibility | Common view of platform health |
+| Governance | Consistent monitoring expectations |
+| Scalability | Reusable pattern across Landing Zones |
+| Cost | Controlled data collection |
+| Security | Improved visibility into relevant security events |
+
+---
+
+# 14. Consequences
+
+### Positive
+
+- Consistent monitoring foundation
+- Shared operational visibility
+- Reusable diagnostic configuration
+- Clear ownership between platform and workloads
+- Reduced monitoring duplication
+
+### Trade-offs
+
+- Central monitoring services become important shared platform dependencies
+- Log ingestion and retention create ongoing costs
+- Poorly designed alerts can create operational noise
+- Monitoring requires ongoing maintenance
+
+These trade-offs are accepted because operational visibility is a core requirement of the enterprise platform.
+
+---
+
+# 15. Scope and Boundaries
 
 This decision applies to:
 
-* Platform services
-* Landing Zones
-* Azure infrastructure
-* Business applications
-* Networking components
-* Security services
-* Shared enterprise services
+- Azure platform services;
+- Landing Zone infrastructure;
+- shared monitoring capabilities;
+- Azure Monitor;
+- Log Analytics;
+- diagnostic settings;
+- platform-level alerts.
 
-All production workloads must integrate with the enterprise monitoring platform before deployment.
+It does not prescribe:
 
----
-
-# 6. Decision Drivers
-
-This decision supports the following strategic objectives:
-
-* Improve operational visibility
-* Detect incidents earlier
-* Reduce service downtime
-* Improve customer experience
-* Standardize monitoring
-* Support compliance reporting
-* Enable proactive operations
-* Improve platform reliability
+- application-specific observability frameworks;
+- application logging formats;
+- a single dashboard for every workload;
+- retention periods independent of governance or operational requirements.
 
 ---
 
-# 7. Architectural Principles
+# 16. Relationship to Other Architecture Decisions
 
-The monitoring platform follows these principles:
-
-* Observability by Design
-* Monitoring First
-* Centralized Logging
-* Metrics-Driven Operations
-* Automated Alerting
-* Operational Transparency
-* Infrastructure as Code
-* Standardized Dashboards
-* Data-Driven Decision Making
-* Continuous Improvement
+| Document | Relationship |
+|---|---|
+| **ADR-001** | Enterprise Landing Zone architecture |
+| **ADR-002** | Hub & Spoke network architecture |
+| **ADR-003** | Terraform as the IaC standard |
+| **ADR-004** | Management Group governance hierarchy |
+| **ADR-005** | Private networking |
+| **ADR-006** | Enterprise identity strategy |
+| **ADR-008** | Enterprise security baseline |
+| **GOV-001** | Governance strategy |
+| **GOV-009** | Landing Zone design |
+| **ARC-003** | Enterprise reference architecture |
 
 ---
 
-# 8. High-Level Architecture
+# 17. Implementation Alignment
 
-```text id="pf7v5k"
-                Azure Resources
-                        │
-        ┌───────────────┼────────────────┐
-        │               │                │
-      Metrics         Logs          Traces
-        │               │                │
-        └───────────────┼────────────────┘
-                        │
-                 Azure Monitor
-                        │
-          Log Analytics Workspace
-                        │
-       ┌────────────────┼─────────────────┐
-       │                │                 │
- Azure Alerts     Azure Workbooks   Application Insights
-       │                │                 │
-       └────────────────┼─────────────────┘
-                        │
-             Azure Managed Grafana
-                        │
-               Operations Team
+Monitoring is implemented as a dedicated **Operations platform capability** within the Terraform foundation.
+
+The current Terraform foundation provides reusable modules for:
+
+- Log Analytics;
+- diagnostic settings;
+- monitoring-related resources.
+
+The implementation should follow:
+
+```text
+Platform
+   │
+   └── Operations Capability
+           │
+           ├── Log Analytics
+           ├── Diagnostics
+           └── Monitoring
+                    │
+                    ▼
+              Landing Zones
+                    │
+                    ▼
+                 Workloads
 ```
 
----
-
-# 9. Expected Benefits
-
-The selected monitoring strategy provides significant business and technical benefits.
-
-## Business Benefits
-
-* Improved service availability
-* Faster incident resolution
-* Better operational reporting
-* Reduced downtime
-* Increased customer satisfaction
-* Simplified compliance audits
-
-## Technical Benefits
-
-* Centralized monitoring
-* Unified dashboards
-* Automated alerting
-* End-to-end observability
-* Faster troubleshooting
-* Better performance analysis
-* Scalable monitoring platform
+Monitoring resources and configuration should be managed through Terraform where they are part of the foundation.
 
 ---
 
-# 10. Alternatives Considered
+# 18. Review
 
-## Option 1 — Decentralized Monitoring
+This decision should be reviewed when significant changes occur to:
 
-### Advantages
-
-* Independent team ownership
-* Flexible tooling
-
-### Disadvantages
-
-* Fragmented visibility
-* Duplicate tooling
-* Difficult governance
-* Increased operational costs
-
-**Decision:** Rejected
+- Azure Monitor capabilities;
+- enterprise operational requirements;
+- logging or retention requirements;
+- Landing Zone architecture;
+- security monitoring requirements;
+- platform operating model.
 
 ---
 
-## Option 2 — Third-Party Monitoring Platform
+# 19. References
 
-### Advantages
-
-* Vendor flexibility
-* Rich ecosystem
-
-### Disadvantages
-
-* Higher licensing costs
-* Additional operational complexity
-* Integration overhead
-
-**Decision:** Rejected
-
----
-
-## Option 3 — Azure Monitor Platform (Selected)
-
-### Advantages
-
-* Native Azure integration
-* Centralized observability
-* Integrated dashboards
-* Built-in alerting
-* Application Insights
-* Azure Managed Grafana
-* Microsoft-recommended architecture
-
-### Disadvantages
-
-* Azure platform dependency
-* Initial operational setup
-* Team onboarding
-
-**Decision:** Accepted
-
----
-
-# 11. Consequences
-
-## Positive
-
-* Enterprise-wide operational visibility
-* Standardized monitoring practices
-* Faster incident response
-* Improved platform reliability
-* Centralized operational reporting
-* Consistent observability across workloads
-
-## Trade-offs
-
-* Increased monitoring infrastructure
-* Storage and telemetry costs
-* Ongoing dashboard maintenance
-* Initial implementation effort
-
-These trade-offs are considered acceptable because comprehensive observability is essential for operating a secure, scalable, and resilient enterprise cloud platform.
-
----
-
-# 12. Related ADRs
-
-* ADR-001 — Enterprise Landing Zone Architecture
-* ADR-002 — Hub & Spoke Network Architecture
-* ADR-003 — Terraform as Infrastructure as Code
-* ADR-004 — Enterprise Management Group Hierarchy
-* ADR-005 — Private Networking Strategy
-* ADR-006 — Enterprise Identity Strategy
-* ADR-008 — Security Baseline
-* GOV-007 — Azure Policy Strategy
-
----
-
-# 13. Review
-
-This architectural decision will be reviewed annually or whenever significant changes occur in:
-
-* Azure Monitor capabilities
-* Azure Managed Grafana features
-* Enterprise operational requirements
-* Compliance obligations
-* Mandara Global's cloud operating model
-
----
-
-# 14. References
-
-* Microsoft Cloud Adoption Framework (CAF)
-* Azure Well-Architected Framework (WAF)
-* Azure Monitor documentation
-* Azure Application Insights documentation
-* Azure Managed Grafana documentation
-* Azure Architecture Center
+- Azure Monitor
+- Azure Log Analytics
+- Azure Diagnostic Settings
+- GOV-009 — Landing Zone Design
+- ARC-003 — Enterprise Reference Architecture
+- ADR-001 — Enterprise Landing Zone Architecture

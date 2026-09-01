@@ -5,7 +5,7 @@
 | **ADR ID**       | ADR-004                               |
 | **Title**        | Enterprise Management Group Hierarchy |
 | **Status**       | Accepted                              |
-| **Date**         | 2026-07-31                            |
+| **Date**         | 2026-08-24                            |
 | **Authors**      | Cloud Architecture Team               |
 | **Program**      | OneCloud 2030                         |
 | **Organization** | Mandara Global                        |
@@ -15,58 +15,69 @@
 
 # 1. Executive Summary
 
-As part of the **OneCloud 2030** transformation program, Mandara Global has decided to implement a standardized **Azure Management Group hierarchy** to govern all Azure subscriptions consistently across the enterprise.
+Mandara Global will use a structured Azure Management Group hierarchy to organize subscriptions and apply enterprise governance consistently.
 
-The Management Group hierarchy establishes a scalable governance model that enables centralized policy enforcement, role-based access control (RBAC), budget management, and operational consistency while allowing individual business units to operate independently within defined governance boundaries.
+The hierarchy separates shared platform subscriptions from workload subscriptions and provides distinct governance boundaries for Corp, Online and Sandbox workloads.
 
-This Architectural Decision Record documents the rationale behind adopting a structured enterprise Management Group hierarchy aligned with Microsoft Cloud Adoption Framework (CAF) guidance.
+The hierarchy is intentionally kept simple to avoid unnecessary Management Group complexity.
 
 ---
 
 # 2. Business Context
 
-Mandara Global is expanding its Azure footprint across multiple business units, development teams, and geographical regions.
+As the Azure footprint grows, subscriptions require a consistent governance structure for:
 
-Without a standardized governance hierarchy, Azure subscriptions would evolve independently, making it increasingly difficult to:
+* Azure Policy
+* RBAC
+* Security controls
+* Subscription organization
+* Cost governance
+* Compliance
 
-* Apply enterprise security policies
-* Standardize access management
-* Manage compliance
-* Control cloud spending
-* Delegate operational responsibilities
-* Scale governance as the organization grows
-
-The **OneCloud 2030** program requires a governance model capable of supporting enterprise-scale cloud adoption while balancing centralized control and operational autonomy.
+A Management Group hierarchy provides the required governance boundaries while allowing subscriptions to remain independently managed within those boundaries.
 
 ---
 
 # 3. Problem Statement
 
-Azure subscriptions represent administrative boundaries but do not provide enterprise governance on their own.
+Subscriptions alone do not provide an enterprise hierarchy for applying common governance controls.
 
-Without a Management Group hierarchy, Mandara Global would face:
+Without Management Groups, governance would require repeated configuration at subscription level and would become harder to maintain as the number of subscriptions increases.
 
-* Inconsistent Azure Policy assignments
-* Fragmented RBAC administration
-* Duplicate governance configurations
-* Difficult compliance reporting
-* Complex subscription onboarding
-* Limited operational visibility
-* Increased governance overhead
-
-A hierarchical governance structure is required to standardize policy enforcement and simplify enterprise cloud management.
+A common hierarchy is therefore required to provide consistent governance inheritance.
 
 ---
 
 # 4. Decision
 
-Mandara Global will organize all Azure subscriptions using a hierarchical **Management Group** structure.
+Mandara Global will organize Azure subscriptions using the following Management Group hierarchy:
 
-The hierarchy will separate **Platform** services from **Landing Zones** while providing dedicated governance boundaries for Production, Non-Production, and Sandbox environments.
+```text
+Tenant Root
+│
+└── Mandara Global
+    │
+    ├── Platform
+    │
+    ├── Landing Zones
+    │   ├── Corp
+    │   ├── Online
+    │   └── Sandbox
+    │
+    └── Decommissioned
+```
 
-Enterprise governance components—including Azure Policy, RBAC assignments, budget controls, and compliance initiatives—will be assigned at the highest appropriate Management Group level to maximize consistency and reduce administrative overhead.
+The hierarchy defines governance boundaries.
 
-The hierarchy will remain flexible enough to support future acquisitions, additional business units, and regional expansion without requiring structural redesign.
+The `Platform` Management Group contains subscriptions hosting shared platform services.
+
+The `Landing Zones` Management Group contains workload subscriptions.
+
+`Corp`, `Online` and `Sandbox` provide different workload governance boundaries.
+
+The `Decommissioned` Management Group contains subscriptions that are no longer active but must remain under controlled governance.
+
+Platform capabilities such as Management, Connectivity, Security, Operations and Identity are **not** represented as separate Management Groups unless a future governance requirement explicitly requires such a boundary.
 
 ---
 
@@ -74,31 +85,29 @@ The hierarchy will remain flexible enough to support future acquisitions, additi
 
 This decision applies to:
 
-* All Azure subscriptions
-* All Management Groups
-* Enterprise governance assignments
-* Azure Policy initiatives
+* Azure Management Groups
+* Azure subscriptions
+* Azure Policy assignments
 * RBAC inheritance
-* Cost management structure
+* Governance initiatives
+* Subscription placement
 * Future Landing Zone deployments
 
-Any deviation from the approved hierarchy requires review and approval by the Enterprise Architecture Board.
+Architectural exceptions require review by the Enterprise Architecture Board.
 
 ---
 
 # 6. Decision Drivers
 
-This decision supports the following strategic objectives:
+The hierarchy is designed to:
 
-* Standardize enterprise governance
-* Simplify subscription management
-* Strengthen security enforcement
-* Improve compliance
-* Reduce governance complexity
-* Enable scalable cloud growth
-* Improve operational consistency
-* Simplify onboarding of new business units
-* Centralize governance management
+* Provide clear governance boundaries
+* Support policy inheritance
+* Simplify subscription organization
+* Separate platform and workloads
+* Avoid unnecessary hierarchy depth
+* Support future subscription growth
+* Maintain clear ownership boundaries
 
 ---
 
@@ -106,123 +115,91 @@ This decision supports the following strategic objectives:
 
 The Management Group hierarchy follows these principles:
 
-* Governance by Design
-* Hierarchical Policy Inheritance
-* Least Privilege Administration
-* Separation of Duties
-* Enterprise Standardization
-* Scalable Governance
-* Platform before Workloads
-* Automation First
-* Operational Simplicity
-* Compliance by Default
+* Governance through hierarchy
+* Policy inheritance
+* Least Privilege
+* Separation of Platform and Workloads
+* Clear Subscription Placement
+* Minimal Hierarchy
+* Automation through Infrastructure as Code
+* Explicit Governance Boundaries
 
 ---
 
 # 8. High-Level Architecture
 
-```text id="2hyqwf"
-Tenant Root Group
-│
-└── Mandara Global
-    │
-    ├── Platform
-    │     ├── Identity
-    │     ├── Connectivity
-    │     ├── Management
-    │     └── Security
-    │
-    ├── Landing Zones
-    │     ├── Production
-    │     ├── Non-Production
-    │     └── Sandbox
-    │
-    └── Decommissioned
+```text
+                         Tenant Root
+                              │
+                       Mandara Global
+                              │
+             ┌────────────────┼────────────────┐
+             │                │                │
+             ▼                ▼                ▼
+         Platform       Landing Zones     Decommissioned
+                              │
+                    ┌─────────┼─────────┐
+                    │         │         │
+                   Corp     Online    Sandbox
+                    │         │         │
+                    └─────────┼─────────┘
+                              │
+                        Subscriptions
+                              │
+                        Resource Groups
+                              │
+                           Resources
 ```
+
+Governance flows through the hierarchy:
+
+```text
+Management Group
+        │
+        ├── Azure Policy
+        ├── RBAC
+        └── Governance Controls
+        │
+        ▼
+Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Resource
+```
+
+Management Groups organize subscriptions for governance. They do not represent platform capabilities or workload environments.
 
 ---
 
 # 9. Expected Benefits
 
-The selected governance model delivers significant business and technical benefits.
-
 ## Business Benefits
 
-* Enterprise-wide governance consistency
-* Simplified compliance management
-* Better financial control
-* Faster onboarding of new subscriptions
-* Improved operational transparency
-* Reduced governance overhead
+* Consistent governance
+* Clear subscription organization
+* Easier onboarding
+* Controlled subscription lifecycle
 
 ## Technical Benefits
 
-* Centralized Azure Policy assignments
-* Simplified RBAC inheritance
-* Consistent security baseline
-* Reduced administrative duplication
-* Standardized subscription organization
-* Scalable governance architecture
-* Easier lifecycle management
+* Policy inheritance
+* Consistent RBAC boundaries
+* Reduced governance duplication
+* Clear platform/workload separation
+* Simple and extensible hierarchy
 
 ---
 
 # 10. Alternatives Considered
 
-## Option 1 — Flat Subscription Model
-
-### Advantages
-
-* Easy to understand
-* Minimal initial setup
-
-### Disadvantages
-
-* Poor scalability
-* Difficult governance
-* Weak policy enforcement
-* Inconsistent administration
-
-**Decision:** Rejected
-
----
-
-## Option 2 — Business Unit–Managed Hierarchies
-
-### Advantages
-
-* High operational autonomy
-* Flexible administration
-
-### Disadvantages
-
-* Inconsistent governance
-* Duplicate policy management
-* Increased operational complexity
-* Difficult compliance reporting
-
-**Decision:** Rejected
-
----
-
-## Option 3 — Enterprise Management Group Hierarchy (Selected)
-
-### Advantages
-
-* Centralized governance
-* Scalable architecture
-* Consistent Azure Policy enforcement
-* Simplified RBAC administration
-* Microsoft-recommended approach
-* Supports enterprise growth
-
-### Disadvantages
-
-* Initial governance planning effort
-* Requires organizational alignment
-* Additional platform administration
-
-**Decision:** Accepted
+| Option                                    | Decision     | Main Reason                                                  |
+| ----------------------------------------- | ------------ | ------------------------------------------------------------ |
+| **Flat Subscription Model**               | Rejected     | Governance becomes repetitive and difficult to scale         |
+| **Business Unit Hierarchies**             | Rejected     | Can create inconsistent governance structures                |
+| **Enterprise Management Group Hierarchy** | **Selected** | Provides common governance boundaries while remaining simple |
 
 ---
 
@@ -230,54 +207,52 @@ The selected governance model delivers significant business and technical benefi
 
 ## Positive
 
-* Consistent governance across all Azure subscriptions
-* Simplified enterprise administration
+* Consistent governance inheritance
+* Clear subscription placement
+* Separation of platform and workload governance
 * Reduced policy duplication
-* Improved compliance reporting
-* Scalable governance model
-* Easier cloud expansion
+* Simple hierarchy
 
 ## Trade-offs
 
-* Greater upfront governance design
-* Ongoing platform governance responsibilities
-* Organizational dependency on standardized processes
+* Requires centralized governance ownership
+* Subscription placement must follow defined rules
+* Changes to the hierarchy require governance review
 
-These trade-offs are acceptable because they establish a sustainable governance framework that supports Mandara Global's long-term cloud strategy.
+These trade-offs are accepted to maintain a consistent enterprise governance model.
 
 ---
 
-# 12. Related ADRs
+# 12. Related Documents
 
-* ADR-001 — Enterprise Landing Zone Architecture
-* ADR-002 — Hub & Spoke Network Architecture
-* ADR-003 — Terraform as Infrastructure as Code
-* ADR-005 — Private Networking Strategy
-* ADR-006 — Identity Strategy
-* ADR-007 — Monitoring Strategy
-* ADR-008 — Security Baseline
-* GOV-002 — Management Group Strategy
+* GOV-002 — Management Groups Strategy
+* GOV-003 — Subscription Strategy
 * GOV-006 — RBAC Strategy
 * GOV-007 — Azure Policy Strategy
+* GOV-009 — Landing Zone Design
+* ADR-001 — Enterprise Landing Zone Architecture
+* ADR-002 — Hub & Spoke Network Architecture
+* ADR-005 — Private Networking Strategy
+* ADR-006 — Enterprise Identity Strategy
+* ADR-008 — Enterprise Security Baseline
 
 ---
 
 # 13. Review
 
-This architectural decision will be reviewed annually or whenever significant changes occur in:
+This decision should be reviewed when significant changes occur to:
 
-* Microsoft Management Group capabilities
-* Azure governance recommendations
+* Azure Management Group capabilities
+* Governance requirements
 * Organizational structure
-* Regulatory or compliance requirements
-* Mandara Global's cloud operating model
+* Security or compliance requirements
+* Enterprise cloud operating model
 
 ---
 
 # 14. References
 
-* Microsoft Cloud Adoption Framework (CAF)
-* Azure Well-Architected Framework (WAF)
-* Azure Architecture Center
+* Microsoft Cloud Adoption Framework
 * Azure Management Groups documentation
-* Azure Enterprise-Scale Landing Zone guidance
+* Azure Architecture Center
+* Azure Landing Zone guidance

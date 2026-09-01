@@ -1,292 +1,254 @@
 # ADR-001 — Enterprise Landing Zone Architecture
 
-| **Attribute**    | **Value**                            |
-| ---------------- | ------------------------------------ |
-| **ADR ID**       | ADR-001                              |
-| **Title**        | Enterprise Landing Zone Architecture |
-| **Status**       | Accepted                             |
-| **Date**         | 2026-07-31                           |
-| **Authors**      | Cloud Architecture Team              |
-| **Program**      | OneCloud 2030                        |
-| **Organization** | Mandara Global                       |
-| **Category**     | Enterprise Architecture              |
+| **Attribute** | **Value** |
+|---|---|
+| **ADR ID** | ADR-001 |
+| **Title** | Enterprise Landing Zone Architecture |
+| **Version** | 1.1 |
+| **Status** | Accepted |
+| **Date** | 2026-08-31 |
+| **Authors** | Cloud Architecture Team |
+| **Program** | OneCloud 2030 |
+| **Organization** | Mandara Global |
+| **Category** | Enterprise Architecture |
 
 ---
 
 # 1. Executive Summary
 
-As part of the **OneCloud 2030** transformation program, Mandara Global has decided to establish an **Enterprise Azure Landing Zone** as the strategic foundation for all future cloud deployments.
+Mandara Global will establish an **Enterprise Azure Landing Zone Architecture** as the foundation for Azure workloads.
 
-The Landing Zone provides a standardized cloud platform that enables secure, scalable, and governed deployment of workloads while ensuring alignment with the organization's cloud strategy, security policies, and operational model.
+The Landing Zone model provides governed workload boundaries while shared platform capabilities provide common identity, connectivity, security, management and operational services.
 
-This Architectural Decision Record documents the rationale behind adopting an Enterprise Landing Zone architecture based on Microsoft Cloud Adoption Framework (CAF) principles.
+This decision builds on the business requirements, cloud strategy, architecture principles and governance framework already established for OneCloud 2030.
 
 ---
 
 # 2. Business Context
 
-Mandara Global is a multinational enterprise operating across multiple geographical regions and business units.
+Mandara Global is a multinational enterprise with multiple Business Units and geographic regions.
 
-Historically, cloud resources have been provisioned independently by individual teams, resulting in inconsistent governance, fragmented security controls, duplicated networking components, and operational inefficiencies.
+Historically, cloud resources have been provisioned independently, creating inconsistent governance, duplicated infrastructure, fragmented security controls and limited operational visibility.
 
-To support long-term digital transformation, the Executive Board launched the **OneCloud 2030** initiative with the objective of establishing a unified cloud operating model across the organization.
+The OneCloud 2030 program requires a common cloud foundation that can:
 
-The platform must support:
+| Requirement | Architectural Response |
+|---|---|
+| Consistent governance | Central governance and policy |
+| Secure workloads | Shared identity and security controls |
+| Scalable cloud adoption | Standard Landing Zone model |
+| Faster onboarding | Reusable platform capabilities |
+| Operational visibility | Shared monitoring and operations |
+| Controlled infrastructure | Terraform-based Infrastructure as Code |
 
-* Enterprise-scale governance
-* Secure-by-default deployments
-* Standardized networking
-* Centralized identity management
-* Operational excellence
-* Infrastructure as Code
-* Future business expansion
+These requirements are consistent with BR-001, BR-003, BR-005, BR-006, BR-007 and BR-009. fileciteturn16file9L1-L15
 
 ---
 
 # 3. Problem Statement
 
-Deploying Azure workloads without a standardized enterprise platform introduces significant operational and governance risks.
+Without a common Landing Zone model, Azure adoption can result in:
 
-Examples include:
+- inconsistent subscription structures;
+- duplicated platform services;
+- fragmented identity and access management;
+- inconsistent security baselines;
+- policy drift;
+- limited operational visibility;
+- difficult onboarding of new Business Units.
 
-* Inconsistent subscription structures
-* Duplicated infrastructure
-* Fragmented identity and access management
-* Inconsistent security baselines
-* Policy drift across environments
-* Limited operational visibility
-* Difficult onboarding of new business units
-
-Without a common Landing Zone, cloud adoption would become increasingly difficult to manage as the organization grows.
+The architecture therefore needs a repeatable boundary between **shared enterprise platform services** and **business workloads**.
 
 ---
 
 # 4. Decision
 
-Mandara Global will implement an **Enterprise Azure Landing Zone Architecture** as the mandatory foundation for all Azure subscriptions and workloads.
+Mandara Global will implement an **Enterprise Azure Landing Zone Architecture** as the standard foundation for Azure workloads.
 
-The Landing Zone will follow the architectural principles defined by the Microsoft Cloud Adoption Framework while being adapted to Mandara Global's organizational structure and governance model.
+The architecture separates:
 
-The architecture will include dedicated platform capabilities for:
+1. **Enterprise governance** — Management Groups, Policy and standards;
+2. **Shared platform capabilities** — Management, Connectivity, Security, Operations and Identity;
+3. **Landing Zones** — governed workload boundaries;
+4. **Subscriptions** — administrative, security, cost and operational boundaries;
+5. **Business workloads** — applications and services deployed within approved Landing Zones.
 
-* Governance
-* Identity
-* Connectivity
-* Security
-* Management
-* Operations
-
-Application workloads will consume these shared platform services rather than implementing them independently.
-
-All infrastructure will be provisioned using **Terraform** to ensure consistency, repeatability, version control, and auditability.
+The five platform capabilities are implementation and ownership boundaries. They are **not Management Groups** and do not replace the governance hierarchy defined in GOV-002.
 
 ---
 
-# 5. Decision Scope
+# 5. Target Landing Zone Model
 
-This architectural decision applies to:
-
-* All Azure subscriptions within Mandara Global
-* All future cloud workloads
-* Shared platform services
-* Enterprise networking
-* Identity services
-* Governance and security controls
-* Infrastructure managed by the Cloud Platform Team
-
-Any exception to this architecture requires formal approval from the Enterprise Architecture Board.
-
----
-
-# 6. Decision Drivers
-
-The decision is driven by the following strategic objectives:
-
-* Accelerate cloud adoption
-* Standardize enterprise architecture
-* Reduce operational complexity
-* Strengthen security posture
-* Improve governance
-* Enable business scalability
-* Increase deployment consistency
-* Support regulatory compliance
-* Improve operational resilience
-
----
-
-# 7. Architectural Principles
-
-The Enterprise Landing Zone is governed by the following principles:
-
-* Platform before Workloads
-* Governance by Design
-* Security by Default
-* Zero Trust Architecture
-* Infrastructure as Code
-* Least Privilege Access
-* Standardization over Customization
-* Modular Platform Design
-* Automation First
-* Operational Excellence
-
----
-
-# 8. High-Level Architecture
+The current Landing Zone model is:
 
 ```text
-Mandara Global Enterprise Platform
+Azure Enterprise Cloud Foundation
 │
-├── Management Groups
+├── Governance
+│   └── Management Groups / Policy
 │
-├── Platform Services
-│     ├── Identity
-│     ├── Connectivity
-│     ├── Security
-│     ├── Management
-│     └── Monitoring
+├── Shared Platform Capabilities
+│   ├── Management
+│   ├── Connectivity
+│   ├── Security
+│   ├── Operations
+│   └── Identity
 │
 └── Landing Zones
-      ├── Production
-      ├── Non-Production
-      └── Sandbox
+    ├── Corp
+    │   ├── Production
+    │   └── Non-Production
+    │
+    ├── Online
+    │   ├── Production
+    │   └── Non-Production
+    │
+    └── Sandbox
 ```
+
+Production and Non-Production are workload environments within the Corp and Online Landing Zone model. They are not separate platform capabilities.
+
+A Landing Zone may contain one or more subscriptions when a separate administrative, security, cost or operational boundary is justified.
+
+---
+
+# 6. Decision Scope
+
+This decision applies to:
+
+- Azure workload subscriptions;
+- shared platform services;
+- enterprise networking;
+- identity and access;
+- security and governance controls;
+- monitoring and operational services;
+- Terraform-managed infrastructure within the foundation.
+
+Exceptions require documented architectural justification and approval through the established governance process.
+
+---
+
+# 7. Decision Drivers
+
+| Driver | Why it matters |
+|---|---|
+| Scalability | Support new Business Units, regions and workloads |
+| Governance | Apply consistent enterprise controls |
+| Security | Provide common identity and security controls |
+| Standardization | Reduce unnecessary variation between workloads |
+| Operational efficiency | Reuse shared services |
+| Automation | Provision infrastructure consistently through IaC |
+| Workload autonomy | Allow Business Units to deploy within defined boundaries |
+
+These drivers directly support the established business requirements and architecture principles. fileciteturn16file6L1-L15 fileciteturn16file8L1-L25
+
+---
+
+# 8. Architectural Principles
+
+The decision aligns with the following principles:
+
+| Principle | Application |
+|---|---|
+| Business Before Technology | Landing Zones address defined business requirements |
+| Platform over Projects | Common services are shared where practical |
+| Infrastructure as Code | Terraform manages the infrastructure |
+| Security by Design | Security controls are part of the platform |
+| Zero Trust | Identity and least privilege guide access |
+| Standardization over Customization | Common Landing Zone patterns are preferred |
+| Shared Services First | Common platform services are centralized |
+| Observability by Default | Workloads and platform services provide operational visibility |
+
+These principles are defined in ARC-001. fileciteturn16file17L1-L25
 
 ---
 
 # 9. Expected Benefits
 
-The selected architecture provides several business and technical benefits.
-
-## Business Benefits
-
-* Faster cloud adoption
-* Reduced operational costs
-* Improved governance
-* Consistent security posture
-* Simplified compliance
-* Standardized operating model
-* Better resource lifecycle management
-
-## Technical Benefits
-
-* Enterprise scalability
-* Modular architecture
-* Reusable Terraform modules
-* Centralized networking
-* Consistent RBAC implementation
-* Simplified monitoring
-* Easier onboarding of new subscriptions
+| Area | Expected Benefit |
+|---|---|
+| Cloud adoption | Faster and more consistent workload onboarding |
+| Governance | Centralized and repeatable controls |
+| Security | Consistent identity and security baseline |
+| Operations | Shared monitoring and operational services |
+| Cost | Reduced duplication of common services |
+| Scalability | Standard model for additional subscriptions and regions |
+| Engineering | Reusable Terraform modules and platform capabilities |
 
 ---
 
 # 10. Alternatives Considered
 
-## Option 1 — Single Subscription
+| Option | Decision | Rationale |
+|---|---|---|
+| **Single Subscription** | Rejected | Limited isolation, governance and scalability |
+| **Independent Subscriptions** | Rejected | Duplicated services and inconsistent governance |
+| **Enterprise Landing Zone** | **Selected** | Provides governed boundaries, shared services and scalable onboarding |
 
-### Advantages
-
-* Simple implementation
-* Low administrative effort
-
-### Disadvantages
-
-* Limited scalability
-* Weak governance
-* Poor isolation
-* Difficult policy management
-
-**Decision:** Rejected
-
----
-
-## Option 2 — Multiple Independent Subscriptions
-
-### Advantages
-
-* Better workload isolation
-* Independent administration
-
-### Disadvantages
-
-* Inconsistent governance
-* Duplicated services
-* Increased operational complexity
-
-**Decision:** Rejected
-
----
-
-## Option 3 — Enterprise Landing Zone (Selected)
-
-### Advantages
-
-* Microsoft-recommended architecture
-* Enterprise governance
-* Scalable platform model
-* Strong security baseline
-* Centralized operations
-* Supports future expansion
-
-### Disadvantages
-
-* Higher initial implementation effort
-* Greater architectural complexity
-* Requires governance maturity
-
-**Decision:** Accepted
+The selected approach retains workload autonomy while establishing common enterprise controls.
 
 ---
 
 # 11. Consequences
 
-## Positive
+### Positive
 
-* Enterprise-ready cloud foundation
-* Consistent governance model
-* Reduced configuration drift
-* Improved operational efficiency
-* Standardized cloud deployments
-* Simplified future platform evolution
+- Standardized Azure onboarding
+- Clear separation between platform and workloads
+- Consistent governance and security
+- Reusable shared services
+- Scalable subscription model
+- Better operational visibility
+- Reduced configuration drift
 
-## Trade-offs
+### Trade-offs
 
-* Higher upfront design effort
-* More platform components to manage
-* Increased learning curve for contributors
+- Higher initial platform design effort
+- Shared services create some platform dependencies
+- Contributors must follow established governance and Terraform patterns
+- Landing Zone design requires ongoing governance
 
-These trade-offs are considered acceptable given the long-term benefits of a governed enterprise platform.
+These trade-offs are accepted because the platform is intended to support long-term enterprise cloud adoption.
 
 ---
 
-# 12. Related ADRs
+# 12. Relationship to Other Architecture Decisions
 
-* ADR-002 — Hub & Spoke Networking
-* ADR-003 — Terraform as Infrastructure as Code
-* ADR-004 — Management Group Hierarchy
-* ADR-005 — Private Networking Strategy
-* ADR-006 — Identity Strategy
-* ADR-007 — Monitoring Strategy
-* ADR-008 — Security Baseline
-* ADR-009 — Naming Convention
-* ADR-010 — Tagging Strategy
+| ADR | Relationship |
+|---|---|
+| ADR-002 | Defines the Hub & Spoke network architecture |
+| ADR-003 | Defines Terraform as the IaC implementation standard |
+| ADR-004 | Defines the Management Group hierarchy |
+| ADR-005 | Defines private networking |
+| ADR-006 | Defines enterprise identity |
+| ADR-007 | Defines monitoring and observability |
+| ADR-008 | Defines the security baseline |
+| ADR-009 | Defines naming standards |
+| ADR-010 | Defines tagging standards |
+
+The Landing Zone decision is therefore the architectural umbrella under which these more specific decisions operate.
 
 ---
 
 # 13. Review
 
-This architectural decision will be reviewed annually or whenever significant changes occur in:
+This decision shall be reviewed when significant changes occur to:
 
-* Microsoft Cloud Adoption Framework guidance
-* Azure Landing Zone recommendations
-* Mandara Global's enterprise strategy
-* Security, compliance, or regulatory requirements
-* Enterprise cloud operating model
+- Azure Landing Zone guidance;
+- enterprise cloud strategy;
+- organizational structure;
+- security or compliance requirements;
+- subscription or workload operating model.
 
 ---
 
 # 14. References
 
-* Microsoft Cloud Adoption Framework (CAF)
-* Azure Well-Architected Framework (WAF)
-* Azure Architecture Center
-* Azure Enterprise-Scale Landing Zone guidance
+- Microsoft Cloud Adoption Framework
+- Azure Architecture Center
+- Azure Well-Architected Framework
+- GOV-002 — Management Group Strategy
+- GOV-003 — Subscription Strategy
+- GOV-009 — Landing Zone Design
+- ARC-002 — High-Level Architecture
+- ARC-003 — Enterprise Reference Architecture

@@ -1,299 +1,353 @@
 # ADR-008 — Enterprise Security Baseline
 
-| **Attribute**    | **Value**                    |
-| ---------------- | ---------------------------- |
-| **ADR ID**       | ADR-008                      |
-| **Title**        | Enterprise Security Baseline |
-| **Status**       | Accepted                     |
-| **Date**         | 2026-07-31                   |
-| **Authors**      | Cloud Architecture Team      |
-| **Program**      | OneCloud 2030                |
-| **Organization** | Mandara Global               |
-| **Category**     | Security                     |
+| Attribute | Value |
+|---|---|
+| **ADR ID** | ADR-008 |
+| **Title** | Enterprise Security Baseline |
+| **Version** | 1.1 |
+| **Status** | Accepted |
+| **Date** | 2026-09-01 |
+| **Authors** | Cloud Architecture Team |
+| **Program** | OneCloud 2030 |
+| **Organization** | Mandara Global |
+| **Category** | Security |
 
 ---
 
 # 1. Executive Summary
 
-As part of the **OneCloud 2030** transformation program, Mandara Global has decided to establish an **Enterprise Security Baseline** that defines the minimum mandatory security controls for all Azure platform services, subscriptions, and workloads.
+Mandara Global will establish a common **security baseline** for the Azure Enterprise Cloud Foundation.
 
-The Security Baseline provides a consistent security foundation across the Azure Enterprise Cloud Foundation, ensuring that governance, identity, networking, monitoring, and workloads are protected using Microsoft's security best practices and Zero Trust principles.
+The baseline combines identity, network security, Azure Policy, monitoring, resource configuration and governance controls.
 
-This Architectural Decision Record documents the rationale for implementing a standardized enterprise security baseline.
+The objective is to establish a minimum security standard across Platform Capabilities and Landing Zones while allowing workload-specific controls where required.
+
+Security is a shared **Platform Capability** and is not itself a Management Group.
 
 ---
 
 # 2. Business Context
 
-Mandara Global operates critical business services in the cloud that process sensitive corporate and customer information.
+The enterprise cloud foundation must provide a consistent minimum level of security across Azure environments.
 
-As cloud adoption expands across the organization, inconsistent implementation of security controls increases the likelihood of:
+Without a common baseline, individual subscriptions and workloads could implement significantly different security controls.
 
-* Security misconfigurations
-* Unauthorized access
-* Regulatory non-compliance
-* Data exposure
-* Operational disruptions
-* Increased cybersecurity risks
-
-The **OneCloud 2030** initiative requires every cloud workload to inherit a common set of enterprise security controls before entering production.
+The security baseline therefore establishes common controls that can be applied consistently while keeping workload-specific security responsibilities within the appropriate boundary.
 
 ---
 
 # 3. Problem Statement
 
-Without a standardized security baseline, each project team would define its own security controls, resulting in inconsistent protection levels and increased operational risk.
+Azure resources can be deployed with different levels of security depending on the workload team, subscription or implementation approach.
 
-Potential consequences include:
-
-* Weak security configurations
-* Inconsistent Azure Policy enforcement
-* Excessive administrative permissions
-* Poor compliance reporting
-* Increased attack surface
-* Delayed incident response
-* Difficult security governance
-
-A unified enterprise security baseline is required to ensure that every Azure deployment meets Mandara Global's minimum security requirements.
+The platform needs a common baseline covering the main security domains without attempting to define every possible workload security requirement.
 
 ---
 
 # 4. Decision
 
-Mandara Global will implement a mandatory **Enterprise Security Baseline** across the Azure Enterprise Cloud Foundation.
+Mandara Global will establish the following enterprise security baseline:
 
-The baseline will include standardized security controls covering:
+| Security Domain | Baseline Approach |
+|---|---|
+| **Identity** | Microsoft Entra ID, Azure RBAC and least privilege |
+| **Privileged Access** | Controlled privileged access and PIM where appropriate |
+| **Network** | Segmentation, NSGs, private connectivity and centralized controls where required |
+| **Policy** | Azure Policy for enforceable governance requirements |
+| **Resource Configuration** | Secure configuration of supported Azure resources |
+| **Monitoring** | Azure Monitor and relevant security logging |
+| **Data Protection** | Encryption and appropriate access controls |
+| **Secrets** | Azure Key Vault where secrets require centralized management |
+| **Governance** | Tags, naming, ownership and resource organization |
 
-* Microsoft Defender for Cloud
-* Azure Policy security initiatives
-* Microsoft Entra ID security controls
-* Multi-Factor Authentication (MFA)
-* Privileged Identity Management (PIM)
-* Azure Key Vault
-* Private Networking
-* Azure Firewall
-* Microsoft Defender for Servers
-* Microsoft Defender for Storage
-* Microsoft Defender for Key Vault
-* Azure Monitor security alerts
-* Security Center recommendations
-* Secure configuration standards
-
-All production workloads must comply with the approved enterprise security baseline before deployment.
+The baseline represents the **minimum enterprise expectation**. Workloads may implement stronger controls where their requirements justify them.
 
 ---
 
-# 5. Decision Scope
+# 5. High-Level Security Model
+
+```text
+                         Enterprise Security
+                                │
+          ┌─────────────────────┼─────────────────────┐
+          │                     │                     │
+          ▼                     ▼                     ▼
+       Identity              Network              Governance
+          │                     │                     │
+      Entra ID             NSG / Private         Azure Policy
+      Azure RBAC            Connectivity         Tags / Naming
+          │                     │                     │
+          └─────────────────────┼─────────────────────┘
+                                │
+                                ▼
+                           Monitoring
+                                │
+                                ▼
+                       Platform & Landing Zones
+                                │
+                                ▼
+                            Workloads
+```
+
+Security is implemented through multiple complementary controls rather than through one security service.
+
+---
+
+# 6. Identity and Access Security
+
+Identity is a primary security control.
+
+The platform uses:
+
+- Microsoft Entra ID for enterprise identity;
+- Azure RBAC for authorization;
+- group-based access where practical;
+- least-privilege assignments;
+- managed identities for supported workloads;
+- controlled privileged access.
+
+These controls are defined in greater detail in ADR-006 and GOV-006.
+
+---
+
+# 7. Network Security
+
+Network security follows the enterprise Hub & Spoke architecture.
+
+The baseline includes:
+
+- network segmentation;
+- Network Security Groups where appropriate;
+- private connectivity for supported services where justified;
+- centralized network controls where required;
+- controlled hybrid connectivity.
+
+Private networking is defined in ADR-005 and the Hub & Spoke architecture in ADR-002.
+
+The baseline does not require every workload to use identical network controls. Controls must be appropriate to the workload and its connectivity requirements.
+
+---
+
+# 8. Governance and Policy
+
+Azure Policy is used to enforce or audit enterprise requirements where appropriate.
+
+Typical policy areas include:
+
+- allowed resource types or locations;
+- security configuration;
+- required tags;
+- resource naming or organization requirements;
+- public exposure controls;
+- monitoring configuration.
+
+Policy should be applied at an appropriate governance scope and should distinguish between requirements that must be **enforced** and requirements that should initially be **audited**.
+
+---
+
+# 9. Data and Secrets Protection
+
+Sensitive data should use the security controls appropriate to its classification and service.
+
+The baseline includes:
+
+- encryption at rest where supported;
+- encryption in transit where supported;
+- controlled access to sensitive data;
+- Azure Key Vault for centralized secret management where appropriate;
+- avoidance of credentials embedded in code or configuration.
+
+Workload-specific data protection requirements remain the responsibility of the workload owner.
+
+---
+
+# 10. Monitoring and Security Visibility
+
+Security-relevant events should be monitored through the enterprise monitoring foundation.
+
+Azure Monitor, Log Analytics and diagnostic settings provide the underlying monitoring capabilities.
+
+Monitoring supports:
+
+- security investigation;
+- operational troubleshooting;
+- detection of configuration issues;
+- governance verification;
+- incident response.
+
+Monitoring does not replace preventive controls such as RBAC, Azure Policy or network security.
+
+---
+
+# 11. Decision Drivers
+
+| Driver | Reason |
+|---|---|
+| **Security** | Establish a consistent minimum protection level |
+| **Consistency** | Apply common controls across environments |
+| **Governance** | Make key requirements enforceable or auditable |
+| **Least Privilege** | Limit access to required permissions |
+| **Visibility** | Detect and investigate relevant events |
+| **Scalability** | Support multiple subscriptions and Landing Zones |
+| **Practicality** | Avoid controls that provide little additional value |
+
+---
+
+# 12. Architectural Principles
+
+| Principle | Application |
+|---|---|
+| **Secure by Default** | Prefer secure configurations where practical |
+| **Least Privilege** | Grant only required access |
+| **Defense in Depth** | Use complementary security controls |
+| **Policy Where Appropriate** | Automate enforceable governance requirements |
+| **Private by Preference** | Prefer private connectivity where justified |
+| **Centralized Shared Controls** | Provide common platform security capabilities |
+| **Workload Responsibility** | Workload teams remain responsible for workload-specific security |
+| **Continuous Visibility** | Monitor relevant security and operational signals |
+
+---
+
+# 13. Alternatives Considered
+
+| Option | Decision | Rationale |
+|---|---|---|
+| **Security defined independently by each workload** | Rejected | Creates inconsistent protection levels |
+| **One centralized security control for everything** | Rejected | Does not address all security domains |
+| **Common baseline + workload-specific controls** | **Selected** | Provides consistency without unnecessary restriction |
+| **Enforce every requirement immediately** | Rejected | Can create deployment disruption where audit-first is more appropriate |
+
+---
+
+# 14. Expected Benefits
+
+| Area | Benefit |
+|---|---|
+| Security | Consistent minimum protection |
+| Governance | Clear enterprise requirements |
+| Operations | Better visibility and troubleshooting |
+| Access | Controlled permissions |
+| Networking | Reduced unnecessary exposure |
+| Scalability | Repeatable controls across Landing Zones |
+| Compliance | Easier evidence and control verification |
+
+---
+
+# 15. Consequences
+
+### Positive
+
+- Consistent enterprise security baseline
+- Clear security responsibilities
+- Better integration between identity, networking, governance and monitoring
+- Reusable platform security controls
+- Reduced risk of inconsistent subscription configurations
+
+### Trade-offs
+
+- Security controls require ongoing maintenance
+- Policy changes can affect existing workloads
+- Central security capabilities require operational ownership
+- Stronger controls can increase implementation effort or cost
+
+The baseline therefore focuses on controls that provide clear enterprise value.
+
+---
+
+# 16. Scope and Boundaries
 
 This decision applies to:
 
-* Azure subscriptions
-* Platform services
-* Landing Zones
-* Azure virtual networks
-* Azure PaaS services
-* Azure IaaS workloads
-* Identity services
-* Shared enterprise services
+- Azure platform capabilities;
+- Azure Landing Zones;
+- shared enterprise security controls;
+- identity and access;
+- network security;
+- Azure Policy;
+- monitoring and security visibility;
+- baseline resource security configuration.
 
-Exceptions require approval from the Enterprise Architecture Board and the Information Security Office.
+It does not define:
 
----
+- detailed application security architecture;
+- application-level authorization;
+- workload-specific threat models;
+- detailed incident response procedures;
+- every security control required by a regulated workload.
 
-# 6. Decision Drivers
-
-This decision supports the following strategic objectives:
-
-* Strengthen enterprise cybersecurity
-* Standardize security controls
-* Reduce cyber risk
-* Improve regulatory compliance
-* Support Zero Trust architecture
-* Protect business-critical assets
-* Simplify security governance
-* Increase operational resilience
+Those concerns remain within the appropriate workload or enterprise security processes.
 
 ---
 
-# 7. Architectural Principles
+# 17. Relationship to Other Architecture Decisions
 
-The Security Baseline follows these principles:
-
-* Security by Default
-* Zero Trust Architecture
-* Least Privilege Access
-* Defense in Depth
-* Continuous Security Assessment
-* Secure Configuration Management
-* Policy-Driven Governance
-* Infrastructure as Code
-* Continuous Monitoring
-* Compliance by Design
+| Document | Relationship |
+|---|---|
+| **ADR-001** | Enterprise Landing Zone architecture |
+| **ADR-002** | Hub & Spoke network architecture |
+| **ADR-003** | Terraform as the IaC standard |
+| **ADR-004** | Management Group governance hierarchy |
+| **ADR-005** | Private networking |
+| **ADR-006** | Enterprise identity strategy |
+| **ADR-007** | Monitoring and observability |
+| **GOV-006** | RBAC strategy |
+| **GOV-007** | Azure Policy strategy |
+| **GOV-008** | Tagging strategy |
+| **GOV-009** | Landing Zone design |
+| **ARC-003** | Enterprise reference architecture |
 
 ---
 
-# 8. High-Level Architecture
+# 18. Implementation Alignment
 
-```text id="fep8ur"
-              Microsoft Entra ID
-                     │
-          Conditional Access / MFA
-                     │
-             Azure Policy & RBAC
-                     │
-      ┌──────────────┼───────────────┐
-      │              │               │
- Azure Firewall  Private Link   Azure Key Vault
-      │              │               │
-      └──────────────┼───────────────┘
-                     │
-         Microsoft Defender for Cloud
-                     │
-             Azure Monitor & Alerts
-                     │
-           Security Operations Team
+Security is implemented across several platform capabilities rather than as a single Terraform stack.
+
+```text
+Platform
+   │
+   ├── Identity Capability
+   │      └── Access / RBAC
+   │
+   ├── Connectivity Capability
+   │      └── Network Security
+   │
+   ├── Security Capability
+   │      └── Policies / Security Controls
+   │
+   └── Operations Capability
+          └── Monitoring / Diagnostics
 ```
 
----
-
-# 9. Expected Benefits
-
-The selected security baseline provides significant business and technical advantages.
-
-## Business Benefits
-
-* Stronger cybersecurity posture
-* Improved regulatory compliance
-* Reduced operational risk
-* Better protection of business data
-* Increased customer confidence
-* Standardized enterprise security
-
-## Technical Benefits
-
-* Consistent security configuration
-* Automated policy enforcement
-* Centralized security monitoring
-* Reduced attack surface
-* Improved threat detection
-* Standardized security controls
-* Simplified security operations
+Terraform provides the implementation mechanism for the security-related infrastructure and configuration managed by this project.
 
 ---
 
-# 10. Alternatives Considered
+# 19. Review
 
-## Option 1 — Project-Specific Security Controls
+This decision should be reviewed when significant changes occur to:
 
-### Advantages
-
-* Flexible implementation
-* Team autonomy
-
-### Disadvantages
-
-* Inconsistent protection
-* Difficult governance
-* Higher operational risk
-* Poor compliance consistency
-
-**Decision:** Rejected
+- Azure security capabilities;
+- enterprise security requirements;
+- identity architecture;
+- networking architecture;
+- Azure Policy strategy;
+- monitoring requirements;
+- Landing Zone architecture.
 
 ---
 
-## Option 2 — Minimum Azure Default Security
+# 20. References
 
-### Advantages
-
-* Simple deployment
-* Low administrative effort
-
-### Disadvantages
-
-* Limited enterprise protection
-* Reactive security model
-* Insufficient governance
-
-**Decision:** Rejected
-
----
-
-## Option 3 — Enterprise Security Baseline (Selected)
-
-### Advantages
-
-* Consistent protection
-* Microsoft-recommended practices
-* Centralized governance
-* Automated compliance
-* Zero Trust alignment
-* Enterprise scalability
-
-### Disadvantages
-
-* Initial implementation effort
-* Ongoing governance responsibilities
-* Continuous policy maintenance
-
-**Decision:** Accepted
-
----
-
-# 11. Consequences
-
-## Positive
-
-* Enterprise-wide security consistency
-* Reduced cyber risk
-* Improved compliance posture
-* Stronger protection of Azure resources
-* Simplified security governance
-* Scalable enterprise security architecture
-
-## Trade-offs
-
-* Increased governance effort
-* Additional security monitoring costs
-* Ongoing policy management
-* Initial organizational adoption
-
-These trade-offs are considered acceptable because a standardized security baseline is fundamental to protecting Mandara Global's cloud platform while enabling secure and sustainable growth.
-
----
-
-# 12. Related ADRs
-
-* ADR-001 — Enterprise Landing Zone Architecture
-* ADR-002 — Hub & Spoke Network Architecture
-* ADR-003 — Terraform as Infrastructure as Code
-* ADR-004 — Enterprise Management Group Hierarchy
-* ADR-005 — Private Networking Strategy
-* ADR-006 — Enterprise Identity Strategy
-* ADR-007 — Enterprise Monitoring & Observability Strategy
-* GOV-006 — RBAC Strategy
-* GOV-007 — Azure Policy Strategy
-* GOV-008 — Tagging Strategy
-
----
-
-# 13. Review
-
-This architectural decision will be reviewed annually or whenever significant changes occur in:
-
-* Microsoft Defender capabilities
-* Azure security recommendations
-* Zero Trust guidance
-* Regulatory or compliance requirements
-* Mandara Global's enterprise security strategy
-
----
-
-# 14. References
-
-* Microsoft Cloud Adoption Framework (CAF)
-* Azure Well-Architected Framework (WAF)
-* Microsoft Defender for Cloud documentation
-* Microsoft Zero Trust Architecture guidance
-* Azure Security Benchmark
-* Azure Architecture Center
-* Azure Policy documentation
+- Microsoft Azure Security documentation
+- Microsoft Entra ID
+- Azure RBAC
+- Azure Policy
+- Azure Monitor
+- Azure Key Vault
+- ADR-005 — Enterprise Private Networking Strategy
+- ADR-006 — Enterprise Identity Strategy
+- ADR-007 — Enterprise Monitoring and Observability Strategy
+- GOV-006 — RBAC Strategy
+- GOV-007 — Azure Policy Strategy
+- GOV-009 — Landing Zone Design
+- ARC-003 — Enterprise Reference Architecture

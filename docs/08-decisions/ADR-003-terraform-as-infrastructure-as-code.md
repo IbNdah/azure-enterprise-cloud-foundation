@@ -4,192 +4,278 @@
 |---|---|
 | **ADR ID** | ADR-003 |
 | **Title** | Terraform as Infrastructure as Code |
+| **Version** | 1.1 |
 | **Status** | Accepted |
-| **Date** | 2026-08-16 |
+| **Date** | 2026-08-31 |
 | **Authors** | Cloud Architecture Team |
 | **Program** | OneCloud 2030 |
 | **Organization** | Mandara Global |
-| **Category** | Platform Engineering |
+| **Category** | Infrastructure as Code |
 
 ---
 
-## 1. Context
+# 1. Executive Summary
 
-The Azure Enterprise Cloud Foundation requires a standardized, repeatable, and auditable approach to infrastructure provisioning.
+Mandara Global will use **Terraform as the standard Infrastructure as Code (IaC) tool** for the Azure Enterprise Cloud Foundation.
 
-Terraform is selected to reduce configuration drift, improve reusability, and provide consistent infrastructure lifecycle management across environments.
+Terraform will be used to define, provision and manage the foundation infrastructure in a repeatable and version-controlled manner.
+
+This decision supports the Landing Zone architecture established by ADR-001 and applies across shared platform capabilities and managed Landing Zone infrastructure.
 
 ---
 
-## 2. Decision
+# 2. Business Context
 
-Terraform is adopted as the standard Infrastructure as Code (IaC) and orchestration tool for the Azure Enterprise Cloud Foundation.
+The OneCloud 2030 program requires a cloud foundation that can be deployed consistently across environments and evolved through controlled changes.
 
-The implementation follows four logical layers:
+Manual Azure provisioning creates risks including:
 
-| Layer | Responsibility |
+- configuration drift;
+- inconsistent environments;
+- limited change traceability;
+- difficult repeatability;
+- increased operational effort.
+
+Infrastructure as Code provides a controlled mechanism for managing the platform and its lifecycle.
+
+---
+
+# 3. Problem Statement
+
+The platform requires a single, repeatable approach for infrastructure provisioning and change management.
+
+Without an IaC standard, teams may use different tools or manual processes, resulting in:
+
+| Risk | Consequence |
 |---|---|
-| **Root** | Enterprise metadata, variables, providers, and orchestration |
-| **Platform Capability** | Capability orchestration and Resource Group ownership |
-| **Reusable Module** | Implementation of individual Azure resources |
-| **Landing Zone** | Business workload infrastructure |
+| Configuration drift | Environments become inconsistent |
+| Manual changes | Reduced traceability |
+| Tool fragmentation | Increased operational complexity |
+| Non-repeatable deployments | Slower onboarding and recovery |
+| Undocumented infrastructure | Difficult maintenance |
 
-Platform capabilities are organized as independent domains:
+A common IaC standard is therefore required.
+
+---
+
+# 4. Decision
+
+Mandara Global will use **Terraform** as the standard IaC technology for the Azure Enterprise Cloud Foundation.
+
+Terraform will manage:
+
+- Azure platform capabilities;
+- Landing Zone infrastructure;
+- reusable infrastructure modules;
+- networking components;
+- governance resources;
+- security resources;
+- monitoring and operational resources;
+- environment-specific configuration.
+
+The repository will treat Terraform configuration as the authoritative definition of infrastructure managed by the project.
+
+---
+
+# 5. Implementation Model
+
+The repository follows a layered Terraform structure:
 
 ```text
-Management
-Connectivity
-Security
-Operations
-Identity
+Terraform
+│
+├── Platform
+│   ├── Management
+│   ├── Connectivity
+│   ├── Security
+│   ├── Operations
+│   └── Identity
+│
+├── Landing Zones
+│   ├── Corp
+│   ├── Online
+│   └── Sandbox
+│
+├── Reusable Modules
+│   ├── Networking
+│   ├── Security
+│   ├── Monitoring
+│   └── Supporting Services
+│
+└── Environments
+    ├── dev
+    ├── test
+    └── prod
 ```
 
-Each capability owns a dedicated Resource Group and its associated platform resources.
+The structure separates reusable implementation from platform capabilities, Landing Zones and environment configuration.
 
 ---
 
-## 3. Architecture
-
-```text
-                         Terraform Root
-                              │
-                    Metadata & Orchestration
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        ▼                     ▼                     ▼
-   Management           Connectivity            Security
-        │                     │                     │
-        ▼                     ▼                     ▼
-   Dedicated RG          Dedicated RG          Dedicated RG
-        │                     │                     │
-        └─────────────────────┼─────────────────────┘
-                              ▼
-                       Reusable Modules
-                              │
-                              ▼
-                       Azure Platform
-                              │
-                              ▼
-                        Landing Zones
-```
-
-Resource Group ownership follows the capability boundary:
-
-| Capability | Resource Group |
-|---|---|
-| Management | `rg-platform-management-<env>-001` |
-| Connectivity | `rg-platform-connectivity-<env>-001` |
-| Security | `rg-platform-security-<env>-001` |
-| Operations | `rg-platform-operations-<env>-001` |
-| Identity | `rg-platform-identity-<env>-001` |
-
----
-
-## 4. Metadata and Tagging
-
-Enterprise metadata is centralized in `terraform/locals.tf`.
-
-Capability-specific metadata is added during root orchestration:
-
-```hcl
-tags = merge(
-  local.common_tags,
-  var.tags,
-  {
-    Capability = "Connectivity"
-  }
-)
-```
-
-Reusable modules consume the resulting configuration and remain capability-agnostic.
-
----
-
-## 5. Architectural Principles
+# 6. Terraform Principles
 
 | Principle | Application |
 |---|---|
-| **Infrastructure as Code** | Azure infrastructure is managed through Terraform |
-| **Modularity** | Azure resources are implemented through reusable modules |
-| **Capability Ownership** | Each capability owns its Resource Group and platform resources |
-| **Centralized Metadata** | Enterprise-wide metadata is maintained at root level |
-| **Separation of Concerns** | Root, capabilities, and modules have distinct responsibilities |
-| **Idempotency** | Terraform maintains the declared desired state |
+| Version Control | Terraform configuration is stored in Git |
+| Reproducibility | Infrastructure can be recreated from code |
+| Reusability | Common resources are implemented as modules |
+| Reviewability | Changes are reviewed before deployment |
+| State Management | Terraform state is stored in the configured remote backend |
+| Least Manual Change | Infrastructure changes should be made through Terraform |
+| Separation of Configuration | Environment-specific values are separated from reusable code |
 
 ---
 
-## 6. Alternatives Considered
+# 7. State Management
+
+Terraform state is managed through the project's remote backend.
+
+The state represents the relationship between Terraform configuration and deployed Azure resources.
+
+The remote-state design provides:
+
+- centralized state storage;
+- controlled access;
+- state locking where supported;
+- separation of state from the source repository.
+
+State files and sensitive state data are not committed to Git.
+
+The remote-state approach is documented in TF-002.
+
+---
+
+# 8. Change Lifecycle
+
+Infrastructure changes follow the general lifecycle:
+
+```text
+Change
+  ↓
+Terraform Code
+  ↓
+Validation
+  ↓
+Plan
+  ↓
+Review
+  ↓
+Apply
+  ↓
+Azure
+  ↓
+State
+```
+
+Terraform validation and planning should be performed before applying infrastructure changes.
+
+Changes should be traceable through version control and code review.
+
+---
+
+# 9. Alternatives Considered
 
 | Option | Decision | Rationale |
 |---|---|---|
-| Azure Portal | ❌ Rejected | Manual provisioning does not provide the required consistency and automation |
-| Bicep | ❌ Rejected | Terraform provides the selected module and orchestration model |
-| Terraform | ✅ Selected | Mature ecosystem, Azure support, modularity, reusability, and CI/CD integration |
+| **Manual Azure Portal** | Rejected | Not sufficiently repeatable or traceable |
+| **Azure CLI / Scripts only** | Rejected as primary IaC | Useful for operational tasks but less suitable as the authoritative infrastructure model |
+| **ARM / Bicep** | Not selected | Valid Azure-native alternatives, but Terraform better fits the project's multi-layer IaC and module model |
+| **Terraform** | **Selected** | Mature declarative model, reusable modules and strong automation support |
+
+The decision is specific to this project; it does not imply that Terraform is universally superior to Bicep or other IaC technologies.
 
 ---
 
-## 7. Consequences
+# 10. Expected Benefits
 
-### Benefits
+| Area | Benefit |
+|---|---|
+| Consistency | Repeatable infrastructure |
+| Governance | Infrastructure changes are controlled and reviewable |
+| Automation | Reduced manual provisioning |
+| Scalability | Reusable patterns for new environments and workloads |
+| Recovery | Infrastructure can be recreated from code |
+| Collaboration | Infrastructure changes are visible in version control |
+| Operations | Reduced configuration drift |
 
-- Consistent infrastructure provisioning
-- Clear capability ownership
-- Reusable Terraform modules
-- Centralized enterprise metadata
-- Reduced configuration drift
-- Repeatable environment deployment
+---
+
+# 11. Consequences
+
+### Positive
+
+- Infrastructure becomes version-controlled
+- Deployments are repeatable
+- Changes are reviewable
+- Reusable modules reduce duplication
+- Platform and Landing Zone infrastructure can follow the same lifecycle model
+- Infrastructure can be validated before deployment
 
 ### Trade-offs
 
-- Terraform state requires controlled management
-- Contributors must follow the defined repository structure
-- Platform orchestration introduces an additional abstraction layer
+- Terraform requires state management
+- Engineers need Terraform knowledge
+- Provider and module versions require lifecycle management
+- Some Azure operations may remain outside Terraform when they are not part of the managed infrastructure scope
+
+The last point is intentional: Terraform is the authoritative tool for **managed infrastructure**, not a requirement to automate every possible Azure operation.
 
 ---
 
-## 8. Validation
+# 12. Scope and Boundaries
 
-The implementation is validated through:
+Terraform is responsible for infrastructure declared within this project.
 
-```text
-terraform fmt
-terraform validate
-terraform plan
-terraform apply
-terraform plan
-```
+It does not replace:
 
-Expected steady-state result:
+- Azure operational procedures;
+- application deployment pipelines;
+- incident management;
+- identity governance processes;
+- manual emergency procedures where explicitly required.
 
-```text
-No changes.
-Your infrastructure matches the configuration.
-```
+Any infrastructure created outside Terraform should have a documented reason and should be reconciled with the IaC model where appropriate.
 
 ---
 
-## 9. Related ADRs
+# 13. Relationship to Other Decisions
 
-| ADR | Decision |
+| Document | Relationship |
 |---|---|
-| ADR-001 | Enterprise Landing Zone Architecture |
-| ADR-002 | Hub & Spoke Network Architecture |
-| ADR-008 | Security Baseline |
-| ADR-009 | Naming Convention |
-| ADR-010 | Tagging Strategy |
+| ADR-001 | Defines the Enterprise Landing Zone architecture |
+| ADR-002 | Defines the network architecture implemented through Terraform |
+| ADR-004 | Defines the Management Group hierarchy |
+| ADR-005 | Defines private networking |
+| ADR-006 | Defines enterprise identity |
+| ADR-007 | Defines monitoring and observability |
+| ADR-008 | Defines the security baseline |
+| ADR-009 | Defines naming standards |
+| ADR-010 | Defines tagging standards |
 
 ---
 
-## 10. Review
+# 14. Review
 
-This decision should be reviewed when significant changes occur to the Terraform architecture, Azure platform strategy, or enterprise cloud operating model.
+This decision should be reviewed when significant changes occur to:
+
+- the enterprise IaC strategy;
+- Azure infrastructure management requirements;
+- Terraform or provider capabilities;
+- the cloud operating model;
+- platform automation requirements.
 
 ---
 
-## 11. References
+# 15. References
 
-- Terraform Documentation
-- Azure Provider for Terraform
+- Terraform documentation
+- Microsoft Azure documentation
 - Microsoft Cloud Adoption Framework
-- Azure Well-Architected Framework
-- Azure Architecture Center
+- TF-001 — Terraform Foundation
+- TF-002 — Remote State
+- TF-003 — Repository Architecture
+- TF-004 — Platform
+- TF-005 — Landing Zones
+- TF-006 — Reusable Modules
+- TF-007 — Environment Structure & Deployment
+- ADR-001 — Enterprise Landing Zone Architecture

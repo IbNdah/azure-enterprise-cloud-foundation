@@ -1,295 +1,342 @@
 # ADR-006 — Enterprise Identity Strategy
 
-| **Attribute**    | **Value**                    |
-| ---------------- | ---------------------------- |
-| **ADR ID**       | ADR-006                      |
-| **Title**        | Enterprise Identity Strategy |
-| **Status**       | Accepted                     |
-| **Date**         | 2026-07-31                   |
-| **Authors**      | Cloud Architecture Team      |
-| **Program**      | OneCloud 2030                |
-| **Organization** | Mandara Global               |
-| **Category**     | Identity & Security          |
+| Attribute | Value |
+|---|---|
+| **ADR ID** | ADR-006 |
+| **Title** | Enterprise Identity Strategy |
+| **Version** | 1.1 |
+| **Status** | Accepted |
+| **Date** | 2026-09-01 |
+| **Authors** | Cloud Architecture Team |
+| **Program** | OneCloud 2030 |
+| **Organization** | Mandara Global |
+| **Category** | Identity & Access Management |
 
 ---
 
 # 1. Executive Summary
 
-As part of the **OneCloud 2030** transformation program, Mandara Global has decided to adopt **Microsoft Entra ID** as the centralized identity and access management platform for the Azure Enterprise Cloud Foundation.
+Mandara Global will use **Microsoft Entra ID as the enterprise identity platform** for the Azure Enterprise Cloud Foundation.
 
-This decision establishes a unified identity architecture that enables secure authentication, centralized authorization, and enterprise governance across all Azure resources while supporting Zero Trust principles.
+Identity and access will be based on centralized identities, group-based access, Azure RBAC, managed identities and least-privilege principles.
 
-This Architectural Decision Record documents the rationale for implementing a centralized enterprise identity strategy aligned with Microsoft's Cloud Adoption Framework (CAF) and Zero Trust architecture guidance.
+Identity is a shared **Platform Capability** and is not itself a Management Group.
 
 ---
 
 # 2. Business Context
 
-Mandara Global operates multiple business units, development teams, and cloud workloads requiring secure and consistent access to enterprise resources.
+The OneCloud 2030 foundation must provide consistent and controlled access to platform services and business workloads.
 
-Historically, application teams managed permissions independently, leading to:
+The identity model must support:
 
-* Inconsistent access control
-* Excessive administrative privileges
-* Difficult user lifecycle management
-* Limited auditability
-* Security risks caused by manual permission assignments
-
-The **OneCloud 2030** initiative requires a centralized identity platform capable of supporting enterprise governance while enabling secure collaboration across the organization.
+- centralized identity management;
+- secure authentication;
+- controlled authorization;
+- workload-to-service authentication;
+- least privilege;
+- separation of administrative responsibilities;
+- scalable access management.
 
 ---
 
 # 3. Problem Statement
 
-Managing identities independently across cloud resources creates operational and security challenges.
+Independent identities and direct permissions across subscriptions would make access management difficult to control and review.
 
-Without a centralized identity strategy, Mandara Global would face:
-
-* Privilege escalation risks
-* Inconsistent RBAC implementation
-* Difficult identity lifecycle management
-* Limited governance over administrative accounts
-* Weak authentication controls
-* Compliance challenges
-* Increased operational overhead
-
-A unified identity platform is required to secure access to enterprise cloud resources while simplifying governance and administration.
+The platform therefore requires a common identity model that separates authentication from authorization and minimizes direct user permissions.
 
 ---
 
 # 4. Decision
 
-Mandara Global will adopt **Microsoft Entra ID** as the enterprise identity provider for all Azure environments.
+| Area | Decision |
+|---|---|
+| Enterprise Identity | **Microsoft Entra ID** |
+| Human Access | Entra ID users and groups |
+| Authorization | Azure RBAC |
+| Workload Authentication | Managed Identities where supported |
+| Privileged Access | PIM where required |
+| Access Model | Least privilege |
+| Group Management | Group-based access preferred |
+| Administrative Separation | Role and scope based |
 
-The identity strategy will include:
-
-* Microsoft Entra ID for centralized identity management
-* Role-Based Access Control (RBAC)
-* Managed Identities for Azure resources
-* Privileged Identity Management (PIM)
-* Conditional Access policies
-* Multi-Factor Authentication (MFA)
-* Enterprise application integration
-* Single Sign-On (SSO)
-
-Long-lived credentials and embedded application secrets will be minimized through the use of Managed Identities and Azure Key Vault.
+Microsoft Entra ID provides the common identity layer across platform capabilities and Landing Zones.
 
 ---
 
-# 5. Decision Scope
+# 5. High-Level Identity Model
+
+```text
+                         Microsoft Entra ID
+                                │
+              ┌─────────────────┴─────────────────┐
+              │                                   │
+              ▼                                   ▼
+       Human Identities                    Workload Identities
+              │                                   │
+        Groups / Roles                       Managed Identity
+              │                                   │
+              ▼                                   ▼
+         Azure RBAC                         Azure Resources
+              │
+       ┌──────┼────────┐
+       ▼      ▼        ▼
+ Management Subscription Resource Group
+ Groups
+       │
+       ▼
+ Azure Resources
+```
+
+The model distinguishes **who or what is requesting access** from **what that identity is allowed to do**.
+
+---
+
+# 6. Human Identity and Access
+
+Human access should use Microsoft Entra ID identities and groups.
+
+Group-based access is preferred over direct user-to-resource assignments.
+
+```text
+User
+ │
+ ▼
+Entra ID Group
+ │
+ ▼
+Azure RBAC Role
+ │
+ ▼
+Defined Azure Scope
+```
+
+The scope should be the smallest practical scope that supports the responsibility.
+
+Typical scopes include:
+
+- Management Group;
+- Subscription;
+- Resource Group;
+- Resource.
+
+This aligns with GOV-006.
+
+---
+
+# 7. Workload Identities
+
+Workloads should use **Managed Identities** where Azure services support them.
+
+```text
+Application / Service
+        │
+        ▼
+Managed Identity
+        │
+        ▼
+Azure Resource
+```
+
+Managed identities avoid storing application credentials where the platform can provide an identity-based alternative.
+
+Workload permissions should remain narrowly scoped and follow the same least-privilege principle as human access.
+
+---
+
+# 8. Privileged Access
+
+Privileged access should be controlled separately from normal user access.
+
+Where appropriate, Microsoft Entra Privileged Identity Management (PIM) should be used for controlled elevation of privileged roles.
+
+```text
+Eligible Administrator
+        │
+        ▼
+     Approval
+        │
+        ▼
+ Temporary Privileged Access
+        │
+        ▼
+ Azure Resource / Governance Scope
+```
+
+Permanent high-privilege assignments should be minimized.
+
+---
+
+# 9. Authorization Model
+
+Authentication and authorization are separate concerns:
+
+| Concern | Responsibility |
+|---|---|
+| **Authentication** | Establish the identity of the user or workload |
+| **Authorization** | Determine what that identity can access or change |
+| **Scope** | Determine where the permission applies |
+| **Governance** | Define enterprise access rules |
+
+Azure RBAC provides the primary authorization mechanism for Azure resources.
+
+Built-in Azure roles should be preferred when they satisfy the requirement. Custom roles should be introduced only where built-in roles do not provide an appropriate permission model.
+
+---
+
+# 10. Decision Drivers
+
+| Driver | Reason |
+|---|---|
+| Security | Centralized identity and controlled access |
+| Least Privilege | Limit permissions to required actions and scopes |
+| Consistency | Common identity model across the platform |
+| Automation | Support workload identities without stored credentials |
+| Scalability | Support multiple Business Units and Landing Zones |
+| Governance | Enable controlled and reviewable access |
+| Operations | Simplify identity and access management |
+
+---
+
+# 11. Architectural Principles
+
+| Principle | Application |
+|---|---|
+| **Central Identity** | Use Microsoft Entra ID as the enterprise identity layer |
+| **Least Privilege** | Grant only the permissions required |
+| **Group-Based Access** | Prefer groups over direct user assignments |
+| **Managed Identity First** | Prefer managed identities for supported Azure workloads |
+| **Separation of Duties** | Separate platform, network, security and workload responsibilities |
+| **Appropriate Scope** | Assign access at the smallest practical scope |
+| **Privileged Access Control** | Use PIM where appropriate |
+| **Shared Capability** | Provide identity centrally rather than duplicating it in Landing Zones |
+
+---
+
+# 12. Alternatives Considered
+
+| Option | Decision | Rationale |
+|---|---|---|
+| **Independent identities per subscription** | Rejected | Fragmented administration |
+| **Direct user permissions** | Rejected as default | Difficult to scale and review |
+| **Application-managed credentials** | Rejected where Managed Identity is supported | Unnecessary credential management |
+| **Microsoft Entra ID + Azure RBAC** | **Selected** | Centralized identity and native Azure authorization |
+| **Custom RBAC roles by default** | Rejected | Adds unnecessary administration where built-in roles are sufficient |
+
+---
+
+# 13. Expected Benefits
+
+| Area | Benefit |
+|---|---|
+| Security | Centralized and controlled access |
+| Administration | Consistent identity management |
+| Least Privilege | Clear role and scope assignment |
+| Workloads | Reduced need for stored credentials |
+| Governance | Reviewable access model |
+| Scalability | Common model across Landing Zones |
+| Operations | Simplified access lifecycle |
+
+---
+
+# 14. Consequences
+
+### Positive
+
+- Centralized enterprise identity
+- Consistent authorization model
+- Reduced credential management for supported workloads
+- Clear separation of administrative responsibilities
+- Better alignment with Zero Trust principles
+- Reusable identity capability across Landing Zones
+
+### Trade-offs
+
+- Entra ID becomes a critical shared dependency
+- Identity and RBAC require ongoing governance
+- Poorly designed groups can create unnecessary complexity
+- Privileged access controls require operational discipline
+
+---
+
+# 15. Scope and Boundaries
 
 This decision applies to:
 
-* Azure subscriptions
-* Azure management plane access
-* Azure resource authorization
-* Platform administrators
-* Enterprise users
-* Service principals
-* Managed identities
-* Enterprise applications
+- Azure platform capabilities;
+- Azure Landing Zones;
+- human access to Azure resources;
+- workload identities;
+- Azure RBAC;
+- privileged Azure access.
 
-Exceptions require approval from both the Enterprise Architecture Board and the Information Security Office.
+It does not define application-specific authorization logic or detailed Conditional Access policies.
 
 ---
 
-# 6. Decision Drivers
+# 16. Relationship to Other Architecture Decisions
 
-This decision supports the following strategic objectives:
-
-* Strengthen enterprise security
-* Reduce identity-related risks
-* Simplify access management
-* Improve governance
-* Enable Zero Trust
-* Support regulatory compliance
-* Standardize authentication
-* Improve operational efficiency
-
----
-
-# 7. Architectural Principles
-
-The Enterprise Identity Strategy follows these principles:
-
-* Identity is the Primary Security Boundary
-* Zero Trust Authentication
-* Least Privilege Access
-* Just-In-Time Administration
-* Centralized Identity Governance
-* Secure by Default
-* Passwordless-Ready Architecture
-* Managed Identities First
-* Continuous Verification
-* Operational Excellence
+| Document | Relationship |
+|---|---|
+| **ADR-001** | Enterprise Landing Zone architecture |
+| **ADR-002** | Hub & Spoke network architecture |
+| **ADR-003** | Terraform as the IaC standard |
+| **ADR-004** | Management Group governance hierarchy |
+| **ADR-005** | Private networking |
+| **ADR-007** | Monitoring and observability |
+| **ADR-008** | Security baseline |
+| **GOV-002** | Management Group governance |
+| **GOV-003** | Subscription strategy |
+| **GOV-006** | RBAC strategy |
+| **GOV-009** | Landing Zone design |
+| **ARC-003** | Enterprise reference architecture |
 
 ---
 
-# 8. High-Level Architecture
+# 17. Implementation Alignment
 
-```text id="e4xv0m"
-              Microsoft Entra ID
-                      │
-         ┌────────────┼────────────┐
-         │            │            │
-       Users      Administrators  Applications
-         │            │            │
-         └────────────┼────────────┘
-                      │
-              Conditional Access
-                      │
-                      MFA
-                      │
-             Azure Role Assignments
-                      │
-      ┌───────────────┼────────────────┐
-      │               │                │
- Landing Zones    Platform Services  Workloads
-      │               │                │
-      └──────── Managed Identities ────┘
-                      │
-                 Azure Key Vault
+Identity is implemented as a dedicated **Identity platform capability** within the Terraform foundation.
+
+```text
+Platform
+   │
+   └── Identity Capability
+           │
+           ├── Microsoft Entra ID
+           ├── RBAC integration
+           └── Managed Identity integration
+                         │
+                         ▼
+                  Landing Zones
+                         │
+                         ▼
+                     Workloads
 ```
 
----
-
-# 9. Expected Benefits
-
-The selected identity architecture delivers significant business and technical advantages.
-
-## Business Benefits
-
-* Improved security posture
-* Centralized access governance
-* Simplified compliance audits
-* Better operational efficiency
-* Faster user onboarding
-* Reduced identity management costs
-
-## Technical Benefits
-
-* Consistent RBAC implementation
-* Secure authentication
-* Reduced credential exposure
-* Automated identity lifecycle
-* Centralized auditing
-* Secure workload identities
-* Stronger Zero Trust implementation
+Azure resources and access assignments managed by this project should remain aligned with Terraform and GOV-006.
 
 ---
 
-# 10. Alternatives Considered
+# 18. Review
 
-## Option 1 — Local Identity Management
+Review this decision when significant changes occur to:
 
-### Advantages
-
-* Simple for isolated environments
-* Minimal initial setup
-
-### Disadvantages
-
-* Poor scalability
-* Weak governance
-* Difficult auditing
-* High operational effort
-
-**Decision:** Rejected
+- Microsoft Entra ID;
+- enterprise identity requirements;
+- Azure RBAC;
+- privileged access requirements;
+- Landing Zone architecture;
+- security or compliance requirements.
 
 ---
 
-## Option 2 — Mixed Identity Providers
+# 19. References
 
-### Advantages
-
-* Flexibility
-* Supports legacy environments
-
-### Disadvantages
-
-* Operational complexity
-* Inconsistent authentication
-* Difficult governance
-* Increased security risk
-
-**Decision:** Rejected
-
----
-
-## Option 3 — Microsoft Entra ID (Selected)
-
-### Advantages
-
-* Native Azure integration
-* Centralized governance
-* Conditional Access
-* Privileged Identity Management
-* Managed Identities
-* Microsoft-recommended architecture
-* Supports Zero Trust
-
-### Disadvantages
-
-* Requires organizational adoption
-* Licensing considerations
-* Initial governance planning
-
-**Decision:** Accepted
-
----
-
-# 11. Consequences
-
-## Positive
-
-* Enterprise-wide identity governance
-* Consistent RBAC implementation
-* Reduced credential management
-* Improved regulatory compliance
-* Stronger authentication controls
-* Simplified identity lifecycle management
-
-## Trade-offs
-
-* Increased identity governance responsibilities
-* Initial implementation effort
-* User adoption and training requirements
-
-These trade-offs are considered acceptable because centralized identity management is fundamental to protecting Mandara Global's cloud platform and supporting long-term enterprise growth.
-
----
-
-# 12. Related ADRs
-
-* ADR-001 — Enterprise Landing Zone Architecture
-* ADR-002 — Hub & Spoke Network Architecture
-* ADR-003 — Terraform as Infrastructure as Code
-* ADR-004 — Enterprise Management Group Hierarchy
-* ADR-005 — Private Networking Strategy
-* ADR-007 — Monitoring Strategy
-* ADR-008 — Security Baseline
-* GOV-006 — RBAC Strategy
-* GOV-007 — Azure Policy Strategy
-
----
-
-# 13. Review
-
-This architectural decision will be reviewed annually or whenever significant changes occur in:
-
-* Microsoft Entra ID capabilities
-* Zero Trust architecture guidance
-* Regulatory or compliance requirements
-* Enterprise identity governance standards
-* Mandara Global's cloud operating model
-
----
-
-# 14. References
-
-* Microsoft Cloud Adoption Framework (CAF)
-* Azure Well-Architected Framework (WAF)
-* Microsoft Entra documentation
-* Microsoft Zero Trust Architecture guidance
-* Azure RBAC documentation
-* Microsoft Privileged Identity Management (PIM) documentation
+- Microsoft Entra ID
+- Azure RBAC
+- Microsoft Entra Privileged Identity Management
+- Azure Managed Identities
+- GOV-006 — RBAC Strategy
+- ARC-003 — Enterprise Reference Architecture
+- ADR-001 — Enterprise Landing Zone Architecture
