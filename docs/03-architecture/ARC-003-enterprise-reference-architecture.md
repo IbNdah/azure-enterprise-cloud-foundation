@@ -1,287 +1,302 @@
-# Enterprise Reference Architecture
+# ARC-003 — Enterprise Reference Architecture
 
-**Document ID:** ARC-003
-**Version:** 1.0
-**Status:** Draft
-**Author:** Cloud Center of Excellence (CCoE)
-**Classification:** Internal Use Only
+| Attribute | Value |
+|---|---|
+| Document ID | ARC-003 |
+| Title | Enterprise Reference Architecture |
+| Version | 1.1 |
+| Status | Approved |
+| Date | 2026-09-01 |
+| Author | Cloud Center of Excellence (CCoE) |
+| Program | OneCloud 2030 |
+| Organization | Mandara Global |
 
----
+## 1. Purpose
 
-# Related Business Requirements
+This document defines the enterprise reference architecture for the Azure Enterprise Cloud Foundation. It connects governance, shared Platform Capabilities, Landing Zones, subscriptions, resource groups, and workloads.
 
-- BR-001 Standardize Cloud Governance
-- BR-003 Strengthen Enterprise Security
-- BR-005 Enable a Scalable Multi-Subscription Model
-- BR-006 Infrastructure as Code
-- BR-007 Support Global Expansion
-- BR-009 Improve Operational Visibility
+It complements ARC-002, which provides the high-level architectural view.
 
----
+## 2. Architectural Model
 
-# Related Architecture Principles
+| Element | Role |
+|---|---|
+| Governance | Enterprise controls and hierarchy |
+| Platform | Shared enterprise capabilities |
+| Landing Zones | Governed workload boundaries |
+| Subscription | Azure administrative, security, cost, and operational boundary |
+| Resource Group | Logical and lifecycle grouping |
+| Resource | Azure service or workload component |
 
-- AP-002 Platform over Projects
-- AP-003 Infrastructure as Code
-- AP-004 Security by Design
-- AP-005 Zero Trust
-- AP-007 Standardization over Customization
-- AP-008 Shared Services First
-- AP-009 Observability by Default
+These elements are related but are not interchangeable.
 
----
+## 3. High-Level Enterprise Structure
 
-# Purpose
+```text
+                         Tenant Root
+                              │
+                       Mandara Global
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+              ▼               ▼               ▼
+          Governance       Platform      Decommissioned
+                              │
+                    Platform Capabilities
+                              │
+                              ▼
+                       Landing Zones
+                              │
+                    ┌─────────┼─────────┐
+                    │         │         │
+                   Corp     Online    Sandbox
+                    │         │         │
+                    └─────────┼─────────┘
+                              │
+                        Subscriptions
+                              │
+                        Resource Groups
+                              │
+                           Resources
+```
 
-This document defines the Azure Enterprise Reference Architecture for Mandara Global.
+This is a conceptual structure. Governance, Platform, and Landing Zones are architectural constructs, not Azure resource types.
 
-It provides a logical blueprint for organizing enterprise cloud capabilities, governance, connectivity, security, shared services, and business workloads.
+## 4. Enterprise Governance
 
-This reference architecture serves as the foundation for all detailed architecture documents, Terraform modules, and implementation decisions.
+Governance establishes the controls under which Azure operates.
 
----
-
-# Executive Summary
-
-The Azure Enterprise Cloud Foundation is designed as a layered architecture.
-
-Each layer provides enterprise capabilities to the layer above while consuming capabilities from the layer below.
-
-This approach promotes modularity, scalability, operational consistency, and long-term maintainability.
-
----
-
-# Architecture Layers
-
-| Layer | Purpose |
-|--------|---------|
-| Enterprise Governance | Enterprise standards and cloud governance |
-| Identity & Security | Identity, authentication, authorization, Zero Trust |
-| Connectivity | Enterprise networking and hybrid connectivity |
-| Platform Services | Shared cloud capabilities |
-| Landing Zones | Standardized subscription environments |
-| Business Workloads | Enterprise applications and digital services |
-| Operations | Monitoring, logging, security operations and automation |
-
----
-
-# Layer 1 — Enterprise Governance
-
-Provides centralized governance for the Azure environment.
-
-Core capabilities:
-
+Key elements:
 - Management Groups
 - Azure Policy
-- Resource Organization
-- Naming Standards
-- Resource Tagging
-- Cost Management
-- Compliance
+- RBAC
+- Subscription strategy
+- Resource organization
+- Naming standards
+- Tagging standards
+- Cost and compliance controls
 
-Primary Objective:
+Management Groups provide the Azure governance hierarchy and are not synonymous with Platform Capabilities.
 
-Maintain consistency across all Business Units.
+## 5. Platform Capabilities
 
----
+The shared Platform is organized into five capabilities:
 
-# Layer 2 — Identity & Security
+| Capability | Primary Responsibility |
+|---|---|
+| Management | Central management and governance-supporting services |
+| Connectivity | Shared network and hybrid connectivity services |
+| Security | Shared security controls and services |
+| Operations | Monitoring, logging, diagnostics, and operational services |
+| Identity | Enterprise identity and access services |
 
-Provides enterprise identity and security services.
+A Platform Capability represents a responsibility and service boundary, not a Management Group. A capability may use multiple Azure resources and scopes where required.
 
-Core capabilities:
+```text
+                    Platform
+                       │
+       ┌───────────────┼───────────────┐
+       ▼               ▼               ▼
+  Management      Connectivity      Security
+       │               │               │
+       └───────────────┼───────────────┘
+                       ▼
+                Operations / Identity
+```
 
+The diagram is conceptual and does not prescribe deployment dependency between capabilities.
+
+## 6. Landing Zones
+
+Landing Zones provide governed boundaries for business workloads.
+
+| Landing Zone | Intended Use |
+|---|---|
+| Corp | Internal and enterprise workloads |
+| Online | Internet-facing or externally accessible workloads |
+| Sandbox | Controlled experimentation and development |
+
+Landing Zones consume shared Platform Capabilities rather than unnecessarily recreating common enterprise services.
+
+## 7. Environment Context
+
+Environment and Landing Zone are separate concepts.
+
+```text
+Landing Zone
+├── Corp
+├── Online
+└── Sandbox
+
+Environment
+├── dev
+├── test
+└── prod
+```
+
+The Landing Zone identifies the workload boundary; the environment identifies the deployment context.
+
+```text
+Corp     ≠ Production
+Online   ≠ Non-Production
+Sandbox  ≠ Environment
+```
+
+The exact combination depends on workload requirements and the enterprise deployment model.
+
+## 8. Subscription and Resource Organization
+
+```text
+Governance Scope
+       │
+       ▼
+Subscription
+       │
+       ▼
+Resource Group
+       │
+       ▼
+Resource
+```
+
+Subscriptions provide administration, security, cost, and operational boundaries. Resource Groups provide logical grouping and lifecycle boundaries.
+
+## 9. Connectivity Reference
+
+```text
+                    Enterprise Connectivity
+                             │
+                             ▼
+                         Hub VNet
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+          Corp Spoke     Online Spoke    Sandbox Spoke
+              │              │              │
+              ▼              ▼              ▼
+          Workloads       Workloads       Workloads
+```
+
+Hybrid connectivity may use VPN or ExpressRoute where required. Private connectivity follows the approved Private Link and Private DNS architecture.
+
+## 10. Security and Identity
+
+Security and identity are cross-cutting concerns.
+
+The reference architecture supports:
 - Microsoft Entra ID
 - RBAC
-- PIM
 - Managed Identities
 - Conditional Access
 - Microsoft Defender for Cloud
 - Key Vault
+- Azure Policy
+- network segmentation
+- private connectivity where appropriate
 
-Primary Objective:
+Controls are applied at the appropriate governance, platform, subscription, or workload boundary.
 
-Implement Zero Trust security across the platform.
+## 11. Operations and Observability
 
----
-
-# Layer 3 — Connectivity
-
-Provides secure enterprise networking.
-
-Core capabilities:
-
-- Hub & Spoke
-- Virtual WAN (future option)
-- Azure Firewall
-- Private DNS
-- VPN / ExpressRoute
-- Network Segmentation
-- Private Endpoints
-
-Primary Objective:
-
-Provide secure connectivity between enterprise resources.
-
----
-
-# Layer 4 — Platform Services
-
-Provides reusable services shared across the enterprise.
+Operations provides shared capabilities for platform and workload visibility.
 
 Examples:
-
-- Shared DNS
-- Shared Monitoring
-- Shared Logging
-- Shared Security
-- Shared Backup
-- Shared Container Registry
-- Shared Automation
-
-Primary Objective:
-
-Reduce duplication through centralized platform capabilities.
-
----
-
-# Layer 5 — Landing Zones
-
-Provides standardized Azure environments for Business Units.
-
-Each Landing Zone includes:
-
-- Subscription
-- Network Connectivity
-- Policies
-- RBAC
-- Monitoring
-- Security Baseline
-- Terraform Deployment
-
-Primary Objective:
-
-Accelerate workload onboarding while maintaining governance.
-
----
-
-# Layer 6 — Business Workloads
-
-Business Units deploy applications inside approved Landing Zones.
-
-Examples:
-
-- Manufacturing
-- Finance
-- HR
-- AI Platform
-- Analytics
-- Customer Applications
-- Internal Platforms
-
-Business Units consume platform capabilities rather than building infrastructure independently.
-
----
-
-# Layer 7 — Operations
-
-Provides centralized operational capabilities.
-
-Includes:
-
 - Azure Monitor
 - Log Analytics
-- Microsoft Sentinel
-- Managed Grafana
+- Diagnostic Settings
 - Alerts
 - Dashboards
-- Incident Management
+- Microsoft Sentinel
+- Managed Grafana where required
 
-Primary Objective:
+The Operations capability provides the shared operational foundation. Workloads remain responsible for workload-specific monitoring.
 
-Maintain operational excellence across the platform.
+## 12. Business Workloads
 
----
+Business workloads are deployed within approved Landing Zones.
 
-# End-to-End Architecture
+Examples include manufacturing, finance, HR, AI and analytics, customer applications, and internal platforms.
+
+Workload teams consume shared platform services while retaining responsibility for application-specific architecture and configuration.
+
+## 13. End-to-End View
 
 ```text
-                     OneCloud 2030
-                            │
-                            ▼
-=========================================================
-                Azure Enterprise Cloud Foundation
-=========================================================
-
- Enterprise Governance
----------------------------------------------------------
-
- Identity & Security
----------------------------------------------------------
-
- Connectivity
----------------------------------------------------------
-
- Platform Services
----------------------------------------------------------
-
- Landing Zones
----------------------------------------------------------
-
- Business Workloads
----------------------------------------------------------
-
- Operations
-
-=========================================================
+                         Azure Tenant
+                              │
+                         Governance
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+          Platform                      Landing Zones
+              │                               │
+      ┌───────┼───────┐              ┌───────┼───────┐
+      ▼       ▼       ▼              ▼       ▼       ▼
+ Management Connectivity Security   Corp    Online  Sandbox
+      │       │       │               │       │       │
+      └───────┼───────┘               └───────┼───────┘
+              ▼                               ▼
+       Operations / Identity            Subscriptions
+                                              │
+                                        Resource Groups
+                                              │
+                                           Resources
+                                              │
+                                          Workloads
 ```
 
----
+This view separates shared platform responsibilities from workload boundaries.
 
-# Azure Technology Mapping
-
-| Architecture Layer | Azure Services |
-|--------------------|----------------|
-| Enterprise Governance | Management Groups, Azure Policy, Cost Management |
-| Identity & Security | Microsoft Entra ID, RBAC, PIM, Key Vault, Defender for Cloud |
-| Connectivity | Hub & Spoke, Azure Firewall, Private DNS, ExpressRoute, VPN Gateway |
-| Platform Services | Azure Automation, Azure Container Registry, Shared Key Vault, Shared Log Analytics |
-| Landing Zones | Azure Subscriptions, Resource Groups, Terraform |
-| Business Workloads | App Services, AKS, Azure Functions, Storage, Databases |
-| Operations | Azure Monitor, Log Analytics, Managed Grafana, Microsoft Sentinel |
-
----
-
-# Architecture Decision Flow
+## 14. Architecture Decision Flow
 
 ```text
 Business Requirements
-        │
-        ▼
+        ↓
 Cloud Strategy
-        │
-        ▼
+        ↓
 Architecture Principles
-        │
-        ▼
-Reference Architecture
-        │
-        ▼
-Architecture Decisions (ADR)
-        │
-        ▼
-Terraform Modules
-        │
-        ▼
+        ↓
+Enterprise Reference Architecture
+        ↓
+Architecture Decisions
+        ↓
+Terraform Implementation
+        ↓
 Azure Resources
 ```
 
----
+## 15. Design Principles
 
-# Key Takeaways
+- Business requirements drive architectural decisions.
+- Governance is applied at the appropriate scope.
+- Shared Platform Capabilities are preferred where reuse is beneficial.
+- Landing Zones provide clear workload boundaries.
+- Subscriptions provide clear Azure administrative boundaries.
+- Security and identity are integrated across the architecture.
+- Infrastructure is managed through Infrastructure as Code.
+- The architecture remains as simple as practical.
 
-- The Azure Enterprise Cloud Foundation is organized into layered enterprise capabilities.
-- Governance, Identity, Networking, Security, and Operations are shared platform services.
-- Landing Zones provide standardized environments for Business Units.
-- Azure services implement  the architecture but do not define it.
-- This layered architecture enables scalability, governance, security, and long-term platform evolution.
+## 16. Scope and Evolution
+
+This document defines the stable logical reference model. Detailed implementation may evolve as Azure services, organizational requirements, and workload patterns change.
+
+A fundamental change to an architectural boundary should trigger review of the relevant architecture and ADR documents.
+
+## 17. Related Documents
+
+| Document | Relationship |
+|---|---|
+| ARC-001 | Architecture Principles |
+| ARC-002 | High-Level Architecture |
+| GOV-002 | Management Group Strategy |
+| GOV-003 | Subscription Strategy |
+| GOV-004 | Resource Organization Strategy |
+| GOV-009 | Landing Zone Design |
+| ADR-001 | Enterprise Landing Zone Architecture |
+| ADR-002 | Hub & Spoke Network Architecture |
+| ADR-004 | Enterprise Management Group Hierarchy |
+| ADR-005 | Private Networking Strategy |
+| TF-004 | Terraform Platform |
+| TF-005 | Terraform Landing Zones |
+| REF-001 | Enterprise Landing Zone Reference Architecture |
+| REF-002 | Enterprise Connectivity Reference Architecture |
