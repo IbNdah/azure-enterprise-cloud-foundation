@@ -1,87 +1,97 @@
 # GOV-007 – Azure Policy Strategy
 
-| **Document ID**  | GOV-007                                                  |
-| ---------------- | -------------------------------------------------------- |
-| **Version**      | 1.1                                                      |
-| **Status**       | Approved                                                 |
-| **Owner**        | Cloud Platform Team                                      |
-| **Audience**     | Cloud Architects, Security Engineers, Platform Engineers |
-| **Organization** | Mandara Global                                           |
-| **Program**      | OneCloud 2030                                            |
+| **Document ID** | GOV-007 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Owner** | Cloud Platform Team |
+| **Audience** | Cloud Architects, Platform Engineers, Security Engineers |
+| **Classification** | Internal Use Only |
 
 ---
 
 # 1. Purpose
 
-As part of the **OneCloud 2030** transformation program, **Mandara Global** is implementing Azure Policy as the primary governance enforcement mechanism to ensure that cloud resources comply with enterprise standards from the moment they are deployed.
+This document defines how Azure Policy is used to enforce governance standards across the Azure Enterprise Cloud Foundation.
 
-This document defines the Azure Policy strategy for the Azure Enterprise Cloud Foundation. The objective is to automate governance, reduce configuration drift, strengthen security, and ensure consistent compliance across all Azure subscriptions and workloads.
-
----
-
-# 2. Design Principles
-
-The Azure Policy strategy follows these principles:
-
-* Enforce governance automatically.
-* Prevent non-compliant deployments whenever possible.
-* Apply policies at the highest appropriate scope.
-* Standardize security and compliance controls.
-* Continuously monitor policy compliance.
+The objective is to automate compliance while applying controls at the highest appropriate scope.
 
 ---
 
-# 3. Policy Assignment Hierarchy
+# 2. Policy Principles
 
-```text id="1crs0o"
+| Principle | Description |
+|---|---|
+| Policy-driven | Use Azure Policy for standards that can be reliably evaluated. |
+| Highest Appropriate Scope | Assign policies where they provide useful inheritance without excessive exceptions. |
+| Built-in First | Prefer built-in definitions when they meet the requirement. |
+| Appropriate Effect | Use Deny, Audit or DeployIfNotExists according to the control objective. |
+| Continuous Review | Monitor compliance and adjust policies as requirements evolve. |
+
+---
+
+# 3. Policy Assignment Model
+
+```text
 Management Group
         │
         ▼
-Subscription
+   Policy Assignment
         │
         ▼
-Resource Group
+   Subscription
         │
         ▼
-Resource
+ Resource Group / Resource
 ```
 
-Policy assignments inherit through the Azure resource hierarchy unless explicitly excluded.
+Policy inheritance follows the Azure resource hierarchy.
 
 ---
 
-# 4. Standard Policy Categories
+# 4. Current Governance Policies
 
-| Category            | Purpose                                            |
-| ------------------- | -------------------------------------------------- |
-| Security            | Enforce secure configurations                      |
-| Networking          | Standardize network configuration                  |
-| Resource Governance | Control supported resource types and locations     |
-| Tagging             | Enforce mandatory metadata                         |
-| Monitoring          | Ensure diagnostic settings are enabled             |
-| Compliance          | Support regulatory and organizational requirements |
+| Policy Area | Purpose | Typical Effect |
+|---|---|---|
+| Allowed Locations | Restrict deployment to approved regions | Deny |
+| Required Tags | Require defined metadata | Deny / Modify where appropriate |
+| Resource Types | Restrict selected resource types where required | Deny |
+| Secure Configuration | Enforce supported secure settings | Deny / Audit |
+| Diagnostics | Enable required diagnostics where practical | DeployIfNotExists |
+| Encryption | Require supported encryption controls | Deny / Audit |
+
+Private connectivity and service-specific controls are applied where justified by workload requirements rather than through a blanket requirement for every resource.
 
 ---
 
 # 5. Policy Effects
 
-| Effect                | Purpose                                                        |
-| --------------------- | -------------------------------------------------------------- |
-| **Audit**             | Identify non-compliant resources without blocking deployments. |
-| **Deny**              | Prevent deployment of non-compliant resources.                 |
-| **DeployIfNotExists** | Automatically deploy required configurations when missing.     |
-| **Modify**            | Automatically remediate resource properties during deployment. |
+| Effect | Use |
+|---|---|
+| Deny | Block non-compliant deployments. |
+| Audit | Record non-compliance without blocking deployment. |
+| DeployIfNotExists | Deploy required supporting configuration when appropriate. |
+| Modify | Adjust resource properties when supported and appropriate. |
 
 ---
 
-# 6. Design Benefits
+# 6. Implementation & Lifecycle
 
-* Automated governance
-* Consistent policy enforcement
-* Reduced configuration drift
-* Improved compliance
-* Lower operational effort
-* Enhanced platform security
+Policies are managed through Infrastructure as Code.
+
+```text
+Policy Definition
+       ↓
+Policy Assignment
+       ↓
+Terraform
+       ↓
+Azure
+       ↓
+Compliance Monitoring
+```
+
+Policy changes are reviewed and validated before deployment.
 
 ---
 
@@ -89,29 +99,24 @@ Policy assignments inherit through the Azure resource hierarchy unless explicitl
 
 ## Decision
 
-Mandara Global has decided to use Azure Policy as the primary governance enforcement mechanism across the Azure Enterprise Cloud Foundation.
+Use Azure Policy as the primary mechanism for automated Azure governance.
 
 ## Rationale
 
-Azure Policy enables governance to be enforced automatically rather than relying on manual operational processes. By applying policies consistently across Management Groups and subscriptions, Mandara Global ensures standardized deployments, improved security, regulatory compliance, and operational consistency in support of the **OneCloud 2030** transformation program.
+Azure Policy provides centralized enforcement and compliance visibility while reducing reliance on manual controls.
 
 ---
 
-# 8. Related Documents
+# 8. Related Documents & Key Takeaways
 
-| Document | Description                |
-| -------- | -------------------------- |
-| GOV-001  | Cloud Governance Strategy  |
-| GOV-002  | Management Groups Strategy |
-| GOV-006  | RBAC Strategy              |
-| GOV-008  | Tagging Strategy           |
-| GOV-009  | Landing Zone Design        |
+| Document | Relationship |
+|---|---|
+| GOV-001 | Governance Strategy |
+| GOV-002 | Management Groups |
+| GOV-003 | Subscription Strategy |
+| GOV-006 | RBAC |
+| GOV-008 | Tagging |
+| GOV-009 | Landing Zones |
+| ADR-008 | Security Baseline |
 
----
-
-# Key Takeaways
-
-* Azure Policy is the primary governance enforcement mechanism for the Azure Enterprise Cloud Foundation.
-* Policies are assigned at the highest appropriate scope to maximize consistency and simplify administration.
-* Governance controls are applied automatically throughout the resource lifecycle.
-* The Azure Policy strategy supports Mandara Global's secure, compliant, and scalable cloud operating model as part of the **OneCloud 2030** transformation program.
+**Key takeaway:** Azure Policy enforces defined standards; it does not replace architecture, RBAC or operational processes.

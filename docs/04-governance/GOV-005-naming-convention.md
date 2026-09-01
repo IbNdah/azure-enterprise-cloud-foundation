@@ -1,121 +1,139 @@
 # GOV-005 – Naming Convention
 
-| **Document ID**  | GOV-005                              |
-| ---------------- | ------------------------------------ |
-| **Version**      | 1.1                                  |
-| **Status**       | Approved                             |
-| **Owner**        | Cloud Platform Team                  |
-| **Audience**     | Cloud Architects, Platform Engineers |
-| **Organization** | Mandara Global                       |
-| **Program**      | OneCloud 2030                        |
+| **Document ID** | GOV-005 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Owner** | Cloud Platform Team |
+| **Audience** | Cloud Architects, Platform Engineers |
+| **Classification** | Internal Use Only |
 
 ---
 
 # 1. Purpose
 
-As part of the **OneCloud 2030** transformation program, **Mandara Global** is adopting a standardized naming convention to ensure that Azure resources are consistently identified across all subscriptions, environments, and business units.
+This document defines the enterprise naming convention for Azure resources.
 
-This document defines the naming convention used within the Azure Enterprise Cloud Foundation. The objective is to improve resource discoverability, simplify operations, support automation, and establish a common language for platform administration throughout the resource lifecycle.
+The objective is to make resources identifiable, searchable and manageable while keeping names predictable and practical.
 
 ---
 
 # 2. Naming Principles
 
-The naming convention follows these principles:
-
-* Use meaningful and consistent names.
-* Follow Azure naming restrictions.
-* Keep resource names short and readable.
-* Include environment information where applicable.
-* Use standard abbreviations.
+| Principle | Description |
+|---|---|
+| Consistent | Use common patterns across the platform. |
+| Readable | Names should be understandable to operators. |
+| Unique where required | Respect Azure uniqueness requirements. |
+| Stable | Avoid embedding values that are likely to change. |
+| Automation-friendly | Naming must work reliably with Terraform and automation. |
 
 ---
 
-# 3. Naming Pattern
+# 3. Naming Components
 
-The standard naming format is:
+Where supported by the Azure resource type, names may use:
 
-```text id="0rjlwm"
-<resource>-<workload>-<environment>
+```text
+<organization>-<workload>-<environment>-<region>-<instance>
 ```
 
-Examples:
-
-```text id="8g7w78"
-vnet-platform-prod
-kv-platform-prod
-law-platform-prod
-stapp-prod
-```
+Not every component is required for every resource. Azure naming limits and uniqueness requirements take precedence.
 
 ---
 
 # 4. Standard Abbreviations
 
-| Resource                | Prefix |
-| ----------------------- | ------ |
-| Resource Group          | rg     |
-| Virtual Network         | vnet   |
-| Network Security Group  | nsg    |
-| Route Table             | rt     |
-| Key Vault               | kv     |
-| Storage Account         | st     |
-| Log Analytics Workspace | law    |
-| Recovery Services Vault | rsv    |
-| Application Gateway     | agw    |
-| Azure Firewall          | afw    |
-| Public IP               | pip    |
+| Resource | Prefix |
+|---|---|
+| Resource Group | `rg` |
+| Virtual Network | `vnet` |
+| Network Security Group | `nsg` |
+| Route Table | `rt` |
+| Key Vault | `kv` |
+| Storage Account | `st` |
+| Log Analytics Workspace | `law` |
+| Recovery Services Vault | `rsv` |
+| Application Gateway | `agw` |
+| Azure Firewall | `afw` |
+| Public IP | `pip` |
+
+These prefixes provide a consistent short form for commonly used Azure resources.
 
 ---
 
 # 5. Environment Codes
 
-| Environment    | Code    |
-| -------------- | ------- |
-| Production     | prod    |
-| Non-Production | nonprod |
-| Sandbox        | sbx     |
+| Environment | Code |
+|---|---|
+| Production | `prod` |
+| Non-Production | `nonprod` |
+| Sandbox | `sbx` |
+
+Environment codes shall be used consistently across resource names where the resource naming rules permit them.
 
 ---
 
-# 6. Examples
+# 6. Naming Examples
 
-| Resource                | Example            |
-| ----------------------- | ------------------ |
-| Resource Group          | rg-platform-prod   |
-| Virtual Network         | vnet-platform-prod |
-| Key Vault               | kv-platform-prod   |
-| Log Analytics Workspace | law-platform-prod  |
-| Azure Firewall          | afw-platform-prod  |
+| Resource | Example |
+|---|---|
+| Resource Group | `rg-platform-prod` |
+| Virtual Network | `vnet-platform-prod` |
+| Key Vault | `kv-platform-prod` |
+| Log Analytics Workspace | `law-platform-prod` |
+| Azure Firewall | `afw-platform-prod` |
+
+The examples illustrate the standard naming logic. Actual names must also comply with the Azure-specific constraints of the resource type.
 
 ---
 
-# 7. Design Decision
+# 7. Resource-Specific Rules
+
+Naming shall follow Azure resource-specific constraints for:
+
+- length;
+- allowed characters;
+- case sensitivity;
+- global uniqueness;
+- immutable naming requirements.
+
+Where Azure imposes a service-specific pattern, that constraint takes precedence over the generic enterprise pattern.
+
+---
+
+# 8. Enforcement
+
+Naming standards are enforced through:
+
+- Terraform modules and variables;
+- code review;
+- Azure Policy where technically appropriate.
+
+Azure Policy is not expected to validate every naming convention when the service does not expose a practical policy condition.
+
+---
+
+# 9. Design Decision
 
 ## Decision
 
-Mandara Global has decided to adopt a standardized naming convention for all Azure resources deployed within the Azure Enterprise Cloud Foundation.
+Adopt a consistent enterprise naming convention with resource-specific patterns where required by Azure.
 
 ## Rationale
 
-A consistent naming convention improves readability, simplifies administration, enables automation, and reduces operational errors. It establishes a common resource identification standard across the organization and supports the governance objectives of the **OneCloud 2030** transformation program while remaining compliant with Azure naming requirements.
+A practical naming standard improves resource identification and automation without creating brittle rules.
 
 ---
 
-# 8. Related Documents
+# 10. Related Documents & Key Takeaways
 
-| Document | Description                    |
-| -------- | ------------------------------ |
-| GOV-003  | Subscription Strategy          |
-| GOV-004  | Resource Organization Strategy |
-| GOV-006  | RBAC Strategy                  |
-| GOV-008  | Tagging Strategy               |
+| Document | Relationship |
+|---|---|
+| GOV-004 | Resource organization |
+| GOV-006 | RBAC |
+| GOV-007 | Azure Policy |
+| GOV-008 | Tagging |
+| GOV-009 | Landing Zones |
 
----
-
-# Key Takeaways
-
-* Azure resources follow a standardized enterprise naming convention.
-* Consistent naming improves governance, automation, and operational efficiency.
-* Standard abbreviations and environment codes provide predictable resource identification.
-* The naming convention supports Mandara Global's enterprise cloud operating model under the **OneCloud 2030** transformation program.
+**Key takeaway:** use a common naming logic, but do not force one literal pattern onto every Azure resource type.

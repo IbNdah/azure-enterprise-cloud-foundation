@@ -1,122 +1,223 @@
-# GOV-009 – Landing Zone Design
+# GOV-009 — Landing Zone Design
 
-| **Document ID**  | GOV-009                                                     |
-| ---------------- | ----------------------------------------------------------- |
-| **Version**      | 1.1                                                         |
-| **Status**       | Approved                                                    |
-| **Owner**        | Cloud Platform Team                                         |
-| **Audience**     | Enterprise Architects, Cloud Architects, Platform Engineers |
-| **Organization** | Mandara Global                                              |
-| **Program**      | OneCloud 2030                                               |
+| Attribute | Value |
+|---|---|
+| **Document ID** | GOV-009 |
+| **Title** | Landing Zone Design |
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Date** | 2026-08-31 |
+| **Program** | OneCloud 2030 |
+| **Organization** | Mandara Global |
 
 ---
 
 # 1. Purpose
 
-As part of the **OneCloud 2030** transformation program, **Mandara Global** is establishing an enterprise Azure Landing Zone to provide a secure, scalable, and standardized cloud foundation for current and future business workloads.
+This document defines the standard Landing Zone model for the Azure Enterprise Cloud Foundation.
 
-This document defines the Landing Zone design of the Azure Enterprise Cloud Foundation. The objective is to provide a production-ready platform that enables consistent governance, networking, security, identity, monitoring, and Infrastructure as Code across the organization.
-
----
-
-# 2. Design Principles
-
-The Landing Zone is built on the following principles:
-
-* Enterprise-scale governance
-* Secure by default
-* Platform standardization
-* Infrastructure as Code
-* Operational excellence
-* Scalability by design
+Landing Zones provide governed boundaries in which business workloads can be deployed while shared enterprise platform capabilities provide common services.
 
 ---
 
-# 3. Landing Zone Architecture
+# 2. Landing Zone Model
 
-```text id="8s0pk7"
-Tenant Root
+The current model contains three Landing Zone types:
+
+| Landing Zone | Purpose |
+|---|---|
+| **Corp** | Internal and enterprise workloads |
+| **Online** | Internet-facing or externally accessible workloads |
+| **Sandbox** | Controlled experimentation and development |
+
+Corp and Online are organized by Production and Non-Production. Sandbox is maintained as a separate Landing Zone.
+
+```text
+Landing Zones
 │
-├── Platform
-│     ├── Identity
-│     ├── Connectivity
-│     └── Management
+├── Corp
+│   ├── Production
+│   └── Non-Production
 │
-└── Landing Zones
-      ├── Production
-      ├── Non-Production
-      └── Sandbox
+├── Online
+│   ├── Production
+│   └── Non-Production
+│
+└── Sandbox
 ```
 
 ---
 
-# 4. Platform Components
+# 3. Relationship to the Platform
 
-| Component         | Purpose                                                           |
-| ----------------- | ----------------------------------------------------------------- |
-| **Identity**      | Microsoft Entra ID integration and identity services              |
-| **Connectivity**  | Shared networking, Azure Firewall, DNS, and connectivity services |
-| **Management**    | Monitoring, logging, backup, governance, and operational services |
-| **Landing Zones** | Business applications and workload subscriptions                  |
+Landing Zones consume shared services provided by the platform.
 
----
+```text
+                    Shared Platform
+                          │
+          ┌───────────────┼───────────────┐
+          │               │               │
+      Identity       Connectivity      Security
+          │               │               │
+          └───────────────┼───────────────┘
+                          │
+                          ▼
+                    Landing Zones
+                          │
+                          ▼
+                      Workloads
+```
 
-# 5. Governance Integration
+The platform capabilities are:
 
-The Landing Zone integrates the following governance capabilities:
+- Management
+- Connectivity
+- Security
+- Operations
+- Identity
 
-* Management Groups
-* Azure Policy
-* Role-Based Access Control (RBAC)
-* Naming Convention
-* Tagging Strategy
-* Infrastructure as Code
-* Continuous Compliance
-
----
-
-# 6. Expected Benefits
-
-* Secure enterprise cloud platform
-* Consistent governance across all subscriptions
-* Simplified operations
-* Standardized deployments
-* Improved compliance
-* Scalable cloud adoption
-* Faster onboarding of new workloads
+These are shared service and ownership boundaries, not automatically Management Groups.
 
 ---
 
-# 7. Design Decision
+# 4. Landing Zone Boundaries
 
-## Decision
+A Landing Zone establishes a governed workload boundary.
 
-Mandara Global has decided to adopt an Azure Landing Zone architecture based on Microsoft Cloud Adoption Framework (CAF) and Azure Landing Zone design principles as the strategic cloud platform for the **OneCloud 2030** transformation program.
+| Boundary | Primary Purpose |
+|---|---|
+| Management Group | Governance and inherited controls |
+| Landing Zone | Workload environment and architectural boundary |
+| Subscription | Administrative, cost, security and operational boundary |
+| Resource Group | Resource organization and lifecycle grouping |
 
-## Rationale
-
-The Azure Landing Zone provides a proven enterprise architecture that combines governance, security, networking, identity, and operational management into a single, standardized platform. This approach enables Mandara Global to accelerate cloud adoption while maintaining consistency, security, and operational excellence across all business units and future workloads.
-
----
-
-# 8. Related Documents
-
-| Document | Description                    |
-| -------- | ------------------------------ |
-| GOV-001  | Cloud Governance Strategy      |
-| GOV-002  | Management Groups Strategy     |
-| GOV-003  | Subscription Strategy          |
-| GOV-004  | Resource Organization Strategy |
-| GOV-005  | Naming Convention              |
-| GOV-006  | RBAC Strategy                  |
-| GOV-007  | Azure Policy Strategy          |
-| GOV-008  | Tagging Strategy               |
+A Landing Zone may contain one or more subscriptions when separate boundaries are justified.
 
 ---
 
-# Key Takeaways
+# 5. Subscription Model
 
-* The Azure Landing Zone is the enterprise cloud foundation for Mandara Global.
-* Governance, security, networking, identity, and operations are integrated into a unified platform architecture.
-* Infrastructure is provisioned through Infrastructure as Code to ensure consistency and repeatability.
-* The Landing Zone enables the **OneCloud 2030** transformation program by providing a secure, scalable, and production-ready cloud operating model aligned with Microsoft best practices.
+Subscriptions are used where isolation or separate ownership is required.
+
+Typical reasons include:
+
+- production isolation;
+- non-production isolation;
+- cost management;
+- security boundaries;
+- operational ownership;
+- workload scale.
+
+Subscription placement follows GOV-003 and the Management Group strategy defined in GOV-002.
+
+---
+
+# 6. Standard Landing Zone Capabilities
+
+Each Landing Zone should integrate with the shared platform for:
+
+| Capability | Expected Integration |
+|---|---|
+| Identity | Enterprise authentication and authorization |
+| Connectivity | Approved network connectivity |
+| Security | Enterprise security controls and policy |
+| Operations | Monitoring, logging and operational visibility |
+| Management | Governance and management services |
+
+Landing Zones should not independently duplicate shared enterprise services unless a documented requirement justifies it.
+
+---
+
+# 7. Network Model
+
+The Landing Zone network model follows the enterprise Hub & Spoke architecture.
+
+```text
+                 Shared Connectivity Hub
+                          │
+             ┌────────────┼────────────┐
+             ▼            ▼            ▼
+          Corp Spoke   Online Spoke  Sandbox Spoke
+             │            │            │
+             ▼            ▼            ▼
+          Workloads     Workloads    Workloads
+```
+
+Shared connectivity services are provided through the Connectivity platform capability.
+
+Detailed network architecture is defined in ADR-002 and the related architecture documents.
+
+---
+
+# 8. Governance Controls
+
+Landing Zones inherit enterprise governance through the Management Group and subscription structure.
+
+Controls include:
+
+- Azure Policy;
+- RBAC;
+- naming conventions;
+- tagging requirements;
+- security baseline;
+- monitoring requirements.
+
+The specific controls are defined in the respective governance strategies and ADRs.
+
+---
+
+# 9. Design Principles
+
+| Principle | Application |
+|---|---|
+| Standardization | Use common Landing Zone patterns |
+| Isolation | Keep workloads within defined boundaries |
+| Shared Services | Reuse enterprise platform capabilities |
+| Governance | Apply controls consistently |
+| Automation | Provision infrastructure through Terraform |
+| Scalability | Support additional subscriptions and workloads |
+| Simplicity | Avoid unnecessary Landing Zone variants |
+
+---
+
+# 10. Consequences
+
+### Benefits
+
+- Consistent workload onboarding
+- Clear workload boundaries
+- Shared enterprise services
+- Reusable governance controls
+- Scalable Azure adoption
+- Reduced infrastructure duplication
+
+### Trade-offs
+
+- Landing Zones require platform dependencies
+- Subscription placement requires governance
+- Shared services need clear ownership
+- Exceptions require additional governance effort
+
+---
+
+# 11. Relationship to Other Documents
+
+| Document | Relationship |
+|---|---|
+| **ARC-002** | High-level architecture |
+| **ARC-003** | Enterprise reference architecture |
+| **GOV-002** | Management Group strategy |
+| **GOV-003** | Subscription strategy |
+| **GOV-004** | Resource organization |
+| **GOV-005** | Naming convention |
+| **GOV-006** | RBAC strategy |
+| **GOV-007** | Azure Policy strategy |
+| **GOV-008** | Tagging strategy |
+| **ADR-001** | Enterprise Landing Zone architecture |
+| **ADR-002** | Hub & Spoke network architecture |
+
+---
+
+# 12. Review
+
+Review the Landing Zone design when significant changes occur to the cloud strategy, organizational model, subscription strategy, security requirements, connectivity architecture or Azure Landing Zone guidance.

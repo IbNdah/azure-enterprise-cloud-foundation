@@ -1,76 +1,91 @@
 # GOV-008 – Tagging Strategy
 
-| **Document ID**  | GOV-008                                                |
-| ---------------- | ------------------------------------------------------ |
-| **Version**      | 1.1                                                    |
-| **Status**       | Approved                                               |
-| **Owner**        | Cloud Platform Team                                    |
-| **Audience**     | Cloud Architects, Platform Engineers, Operations Teams |
-| **Organization** | Mandara Global                                         |
-| **Program**      | OneCloud 2030                                          |
+| **Document ID** | GOV-008 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Owner** | Cloud Platform Team |
+| **Audience** | Cloud Architects, Platform Engineers, Operations Team |
+| **Classification** | Internal Use Only |
 
 ---
 
 # 1. Purpose
 
-As part of the **OneCloud 2030** transformation program, **Mandara Global** is implementing a standardized resource tagging strategy to improve governance, operational visibility, cost management, and automation across the Azure Enterprise Cloud Foundation.
+This document defines the enterprise tagging strategy for Azure resources.
 
-This document defines the mandatory tagging standard applied to Azure resources. The objective is to ensure that every deployed resource contains consistent business and operational metadata throughout its lifecycle.
+The objective is to provide the minimum metadata required for ownership, environment identification, cost allocation and operational management.
 
 ---
 
-# 2. Design Principles
+# 2. Tagging Principles
 
-The tagging strategy follows these principles:
-
-* Apply mandatory tags to all supported Azure resources.
-* Use standardized tag names and values.
-* Automate tag enforcement using Azure Policy where possible.
-* Support governance, reporting, and cost allocation.
-* Maintain consistency across all subscriptions and environments.
+| Principle | Description |
+|---|---|
+| Minimal | Keep mandatory tags limited to useful information. |
+| Consistent | Use standardized names and values. |
+| Automated | Apply and validate tags through Terraform and Azure Policy where appropriate. |
+| Actionable | Every mandatory tag should support an operational or governance need. |
 
 ---
 
 # 3. Mandatory Tags
 
-| Tag              | Description                                 |
-| ---------------- | ------------------------------------------- |
-| **Application**  | Business application or workload name.      |
-| **Environment**  | Production, Non-Production, or Sandbox.     |
-| **BusinessUnit** | Owning business department or organization. |
-| **Owner**        | Service or application owner.               |
-| **CostCenter**   | Financial cost allocation identifier.       |
-| **ManagedBy**    | Managing team or automation platform.       |
+| Tag | Purpose | Example |
+|---|---|---|
+| **Environment** | Deployment context | Production |
+| **Application** | Workload or platform identification | CloudFoundation |
+| **Owner** | Responsible team | Platform |
+| **CostCenter** | Financial ownership | IT-001 |
+
+These tags are mandatory for applicable managed resources.
 
 ---
 
-# 4. Example Tags
+# 4. Optional Tags
 
-| Tag          | Value               |
-| ------------ | ------------------- |
-| Application  | EnterprisePortal    |
-| Environment  | prod                |
-| BusinessUnit | DigitalServices     |
-| Owner        | Cloud Platform Team |
-| CostCenter   | CC-1001             |
-| ManagedBy    | Terraform           |
+| Tag | Purpose |
+|---|---|
+| Project | Project identification |
+| BusinessUnit | Organizational ownership |
+| Criticality | Business importance |
+| ManagedBy | Management or automation responsibility |
 
----
-
-# 5. Governance Enforcement
-
-Resource tags are enforced using Azure Policy whenever supported. Resources that do not comply with the mandatory tagging standard may be denied during deployment or automatically remediated using Azure Policy.
+Optional tags should only be introduced when they have a defined use.
 
 ---
 
-# 6. Design Benefits
+# 5. Tag Values
 
-* Improved resource visibility
-* Accurate cost allocation
-* Simplified operational management
-* Enhanced automation
-* Better compliance reporting
-* Consistent enterprise metadata
+Tag values should be:
+
+- consistent;
+- documented;
+- meaningful;
+- compatible with reporting requirements.
+
+Controlled values should be used where a common enterprise vocabulary is required.
+
+---
+
+# 6. Enforcement
+
+Tags are:
+
+```text
+Terraform
+   │
+   ▼
+Resource Deployment
+   │
+   ▼
+Azure Policy Validation
+   │
+   ▼
+Compliance Monitoring
+```
+
+Terraform is the primary mechanism for applying standard tags during deployment. Azure Policy provides enforcement or compliance validation where supported.
 
 ---
 
@@ -78,28 +93,23 @@ Resource tags are enforced using Azure Policy whenever supported. Resources that
 
 ## Decision
 
-Mandara Global has decided to implement a mandatory enterprise tagging standard for all supported Azure resources deployed within the Azure Enterprise Cloud Foundation.
+Adopt a small set of mandatory tags and enforce them through Infrastructure as Code and Azure Policy where practical.
 
 ## Rationale
 
-Standardized resource tags provide essential business and operational metadata that supports governance, automation, financial management, and compliance reporting. Automated enforcement through Azure Policy ensures consistent adoption while reducing manual effort and operational inconsistencies across the **OneCloud 2030** cloud platform.
+A limited tagging model provides useful governance and cost metadata without creating unnecessary operational overhead.
 
 ---
 
-# 8. Related Documents
+# 8. Related Documents & Key Takeaways
 
-| Document | Description           |
-| -------- | --------------------- |
-| GOV-005  | Naming Convention     |
-| GOV-006  | RBAC Strategy         |
-| GOV-007  | Azure Policy Strategy |
-| GOV-009  | Landing Zone Design   |
+| Document | Relationship |
+|---|---|
+| GOV-001 | Governance Strategy |
+| GOV-004 | Resource Organization |
+| GOV-005 | Naming Convention |
+| GOV-007 | Azure Policy |
+| GOV-009 | Landing Zones |
+| ADR-010 | Enterprise Tagging Strategy |
 
----
-
-# Key Takeaways
-
-* All supported Azure resources must include the mandatory enterprise tags.
-* Resource tags enable governance, automation, reporting, and cost management.
-* Azure Policy is used to enforce tagging standards consistently across the platform.
-* The tagging strategy supports Mandara Global's enterprise governance model and the long-term objectives of the **OneCloud 2030** transformation program.
+**Key takeaway:** tagging provides metadata; it does not replace naming, resource organization or governance boundaries.

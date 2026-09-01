@@ -1,136 +1,136 @@
 # GOV-001 – Cloud Governance Strategy
 
-| **Document ID**  | GOV-001                                                  |
-| ---------------- | -------------------------------------------------------- |
-| **Version**      | 1.1                                                      |
-| **Status**       | Approved                                                 |
-| **Owner**        | Cloud Platform Team                                      |
-| **Audience**     | Cloud Architects, Platform Engineers, Security Engineers |
-| **Organization** | Mandara Global                                           |
-| **Program**      | OneCloud 2030                                            |
+| **Document ID** | GOV-001 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Owner** | Cloud Platform Team |
+| **Audience** | Cloud Architects, Platform Engineers, Security Engineers |
+| **Classification** | Internal Use Only |
 
 ---
 
 # 1. Purpose
 
-As part of its **OneCloud 2030** transformation program, **Mandara Global** is establishing an enterprise-wide Azure Cloud Foundation to modernize its global IT landscape and provide a secure, scalable, and governed cloud platform for all business units.
+This document defines the governance strategy for the Azure Enterprise Cloud Foundation.
 
-This document defines the cloud governance strategy supporting this initiative. It establishes the governance principles, policies, and operating model required to ensure consistent, secure, and compliant cloud adoption across the organization while enabling application teams to deliver business value efficiently.
+The objective is to establish consistent governance across Azure while enabling Business Units to deploy workloads within defined boundaries.
 
 ---
 
 # 2. Governance Objectives
 
-| Objective                  | Description                                                                |
-| -------------------------- | -------------------------------------------------------------------------- |
-| **Security**               | Protect cloud resources using secure-by-default configurations.            |
-| **Standardization**        | Apply consistent deployment and operational standards across the platform. |
-| **Compliance**             | Ensure adherence to organizational and regulatory requirements.            |
-| **Cost Optimization**      | Improve cost visibility and optimize cloud spending.                       |
-| **Operational Excellence** | Automate governance and reduce operational overhead.                       |
+| Objective | Description |
+|---|---|
+| Security | Protect identities, workloads and data. |
+| Standardization | Apply common naming, tagging and resource standards. |
+| Compliance | Enforce organizational and regulatory requirements. |
+| Cost Management | Provide visibility and accountability for cloud spending. |
+| Operations | Maintain consistent operational and monitoring standards. |
 
 ---
 
 # 3. Governance Principles
 
-The Azure platform is governed by the following principles.
-
-| Principle                  | Description                                                                         |
-| -------------------------- | ----------------------------------------------------------------------------------- |
-| **Security by Default**    | Secure configurations are enabled by default.                                       |
-| **Policy First**           | Governance is enforced through Azure Policy rather than manual processes.           |
-| **Least Privilege**        | Users receive only the permissions required to perform their responsibilities.      |
-| **Automation First**       | Governance controls are implemented using Infrastructure as Code whenever possible. |
-| **Standardization**        | Naming, tagging and resource organization follow common standards.                  |
-| **Continuous Improvement** | Governance evolves continuously to support new business and technical requirements. |
+| Principle | Description |
+|---|---|
+| Security by Default | Secure configurations are preferred and enforced where appropriate. |
+| Policy First | Azure Policy is used to enforce applicable standards. |
+| Least Privilege | Access is limited to the permissions required for a role. |
+| Automation | Governance controls are implemented through automation and IaC where practical. |
+| Standardization | Common enterprise standards are preferred over unnecessary customization. |
+| Continuous Improvement | Governance evolves with business, technical and regulatory requirements. |
 
 ---
 
 # 4. Governance Domains
 
-Cloud governance is organized into the following domains.
-
-| Domain                | Purpose                                           |
-| --------------------- | ------------------------------------------------- |
-| Identity              | Secure authentication and authorization           |
-| Resource Organization | Organize subscriptions and resources consistently |
-| Networking            | Provide secure and controlled connectivity        |
-| Security              | Protect workloads and data                        |
-| Cost Management       | Monitor and optimize cloud spending               |
-| Monitoring            | Ensure platform visibility and operational health |
+| Domain | Purpose |
+|---|---|
+| Identity & Access | Authentication, authorization and RBAC. |
+| Resource Organization | Management Groups, subscriptions, resource groups and lifecycle structure. |
+| Networking | Secure and controlled connectivity. |
+| Security | Protection of workloads and data. |
+| Cost Management | Cost visibility, allocation and control. |
+| Monitoring | Operational visibility and compliance monitoring. |
 
 ---
 
 # 5. Governance Model
 
-The governance process follows a continuous lifecycle.
-
 ```text
 Business Requirements
-         │
-         ▼
- Governance Standards
-         │
-         ▼
- Azure Policies
-         │
-         ▼
- Terraform Deployment
-         │
-         ▼
- Monitoring & Compliance
-         │
-         ▼
- Continuous Improvement
+        │
+        ▼
+Governance Standards
+        │
+        ├── Management Groups
+        ├── Azure Policy
+        ├── RBAC
+        ├── Naming & Tagging
+        └── Cost Controls
+        │
+        ▼
+Landing Zones & Subscriptions
+        │
+        ▼
+Workloads
+        │
+        ▼
+Monitoring & Compliance
+        │
+        ▼
+Continuous Improvement
 ```
 
-Governance controls are integrated throughout the entire resource lifecycle rather than applied after deployment.
+Governance controls are applied throughout the resource lifecycle.
 
 ---
 
-# 6. Success Criteria
+# 6. Governance Responsibilities
 
-The governance strategy aims to achieve the following objectives.
+| Area | Primary Responsibility |
+|---|---|
+| Enterprise Governance | Cloud Center of Excellence |
+| Platform Governance | Cloud Platform Team |
+| Security Controls | Security Team |
+| Identity & Access | Identity / Security Team |
+| Workload Governance | Business Unit / Application Teams |
+| Compliance | Governance and Security functions |
 
-| KPI                            | Target                        |
-| ------------------------------ | ----------------------------- |
-| Infrastructure managed as Code | 100%                          |
-| Mandatory resource tagging     | 100%                          |
-| Least privilege access         | 100%                          |
-| Policy compliance              | >95%                          |
-| Cost monitoring                | Enabled for all subscriptions |
+Responsibilities may be delegated, but enterprise standards remain centrally defined.
 
 ---
 
-# 7. Design Decision
+# 7. Governance Measures
+
+| Measure | Target |
+|---|---|
+| Infrastructure managed as Code | 100% |
+| Required tags | 100% for applicable resources |
+| Policy compliance | >95% |
+| Cost monitoring | Enabled for all managed subscriptions |
+| RBAC | Group-based access preferred |
+
+Targets are governance objectives and may be refined as operational data becomes available.
+
+---
+
+# 8. Related Documents & Decision
 
 ## Decision
 
-Mandara Global has decided to adopt a centralized cloud governance model aligned with Azure Landing Zone principles as the governance foundation of the **OneCloud 2030** transformation program.
+Adopt a centralized governance model aligned with the Azure Landing Zone architecture.
 
-## Rationale
+| Document | Relationship |
+|---|---|
+| GOV-002 | Management Group hierarchy |
+| GOV-003 | Subscription strategy |
+| GOV-004 | Resource organization |
+| GOV-005 | Naming convention |
+| GOV-006 | RBAC |
+| GOV-007 | Azure Policy |
+| GOV-008 | Tagging |
+| GOV-009 | Landing Zone design |
 
-A centralized governance model provides consistent standards, strengthens security, simplifies operations, and enables scalable cloud adoption across multiple business units. It also establishes a common operating model that supports Mandara Global's long-term cloud strategy.
-
----
-
-# 8. Related Documents
-
-| Document | Description                |
-| -------- | -------------------------- |
-| GOV-002  | Management Groups Strategy |
-| GOV-003  | Subscription Strategy      |
-| GOV-005  | Naming Convention          |
-| GOV-006  | RBAC Strategy              |
-| GOV-007  | Azure Policy               |
-| GOV-009  | Landing Zone Design        |
-
----
-
-# Key Takeaways
-
-* Cloud governance is a strategic pillar of Mandara Global's **OneCloud 2030** transformation program.
-* Governance enables secure, scalable, and standardized cloud adoption across the enterprise.
-* Policies enforce organizational standards automatically.
-* Infrastructure is managed through Infrastructure as Code.
-* Continuous governance ensures long-term platform maturity.
+**Key takeaway:** governance defines the enterprise rules; Management Groups, Policies, RBAC and standards implement those rules at the appropriate scope.
