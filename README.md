@@ -1,6 +1,6 @@
 # Azure Enterprise Cloud Foundation
 
-![Status](https://img.shields.io/badge/Status-In%20Progress-blue)
+![Status](https://img.shields.io/badge/Status-Active-blue)
 ![Platform](https://img.shields.io/badge/Platform-Microsoft%20Azure-0078D4)
 ![IaC](https://img.shields.io/badge/IaC-Terraform-7B42BC)
 ![Architecture](https://img.shields.io/badge/Architecture-Enterprise-success)
@@ -16,9 +16,9 @@ A production-inspired Azure Enterprise Cloud Foundation demonstrating enterprise
 
 The Azure Enterprise Cloud Foundation is a production-inspired reference implementation of an enterprise cloud platform built on Microsoft Azure.
 
-Rather than focusing solely on Azure infrastructure deployment, this project follows an **Architecture-First** approach where business objectives, cloud strategy, governance, and architecture principles drive every technical decision.
+Rather than focusing solely on Azure infrastructure deployment, this project follows an **Architecture-First** approach where business objectives, cloud strategy, governance, and architecture principles drive technical decisions.
 
-The repository demonstrates how an enterprise cloud platform evolves from business vision to production-ready Infrastructure as Code while applying Microsoft Azure best practices for governance, security, networking, and platform engineering.
+The repository demonstrates how an enterprise cloud platform evolves from business vision to Infrastructure as Code while applying consistent principles for governance, security, networking, and platform engineering.
 
 ---
 
@@ -27,6 +27,7 @@ The repository demonstrates how an enterprise cloud platform evolves from busine
 - Executive Summary
 - Project Overview
 - Architecture Lifecycle
+- High-Level Architecture
 - Repository Structure
 - Project Status
 - Project Roadmap
@@ -43,7 +44,7 @@ The repository demonstrates how an enterprise cloud platform evolves from busine
 
 This repository demonstrates how an enterprise organization designs, governs, and implements a modern Azure Cloud Foundation.
 
-Instead of concentrating only on Azure resources, the project emphasizes the complete enterprise architecture lifecycle—from business strategy and governance to Infrastructure as Code and platform operations.
+Instead of concentrating only on Azure resources, the project emphasizes the complete enterprise architecture lifecycle—from business strategy and governance to Infrastructure as Code and platform capabilities.
 
 The project showcases:
 
@@ -56,76 +57,113 @@ The project showcases:
 - Infrastructure as Code
 - Operational Excellence
 
-Every implementation is designed to be traceable back to documented architecture decisions and governance standards.
+The implementation is traceable to documented architecture decisions and governance standards.
 
 ---
 
 # Architecture Lifecycle
 
-The project follows a structured enterprise architecture lifecycle.
+The project follows a structured lifecycle from business intent to implementation:
 
 ```text
-Business
-      │
-      ▼
 Business Requirements
-      │
-      ▼
+        │
+        ▼
 Cloud Strategy
-      │
-      ▼
+        │
+        ▼
 Architecture Principles
-      │
-      ▼
-Architecture Decision Records
-      │
-      ▼
-Reference Architecture
-      │
-      ▼
+        │
+        ▼
+High-Level Architecture
+        │
+        ▼
 Governance
-      │
-      ▼
-Security
-      │
-      ▼
-Networking
-      │
-      ▼
+        │
+        ▼
+Architecture Decisions
+        │
+        ▼
+Reference Architectures
+        │
+        ▼
 Terraform Implementation
-      │
-      ▼
-Platform Operations
+        │
+        ▼
+Azure Platform
 ```
 
-This lifecycle ensures complete traceability from business objectives to Azure implementation.
+This structure provides traceability from business objectives through architecture and governance to implementation.
 
 ---
+
+# High-Level Architecture
+
+The current enterprise model separates governance, shared platform capabilities, and workload Landing Zones.
+
+```text
+                         Tenant Root
+                              │
+                       Mandara Global
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+              ▼               ▼               ▼
+          Governance       Platform      Decommissioned
+                              │
+                    Platform Capabilities
+                              │
+                              ▼
+                       Landing Zones
+                              │
+                    ┌─────────┼─────────┐
+                    │         │         │
+                   Corp     Online    Sandbox
+                    │         │         │
+                    └─────────┼─────────┘
+                              │
+                        Subscriptions
+                              │
+                        Resource Groups
+                              │
+                           Resources
+```
+
+The five shared Platform Capabilities are:
+
+- Management
+- Connectivity
+- Security
+- Operations
+- Identity
+
+**Management Groups and Platform Capabilities are distinct concepts:** Management Groups provide the Azure governance hierarchy, while Platform Capabilities represent shared platform responsibilities and services.
+
+---
+
 # Repository Structure
 
-The repository is organized according to enterprise architecture domains, separating strategy, architecture, governance, implementation, and operations.
+The repository is organized according to enterprise architecture domains and implementation concerns.
 
 ```text
 azure-enterprise-cloud-foundation/
 
-docs/
-├── 01-business/       Business Discovery & Requirements
-├── 02-strategy/       Cloud Strategy
-├── 03-architecture/   Architecture Design
-├── 04-governance/     Governance Framework
-├── 05-networking/     Enterprise Networking
-├── 06-security/       Security Architecture
-├── 07-operations/     Platform Operations
-├── 08-decisions/      Architecture Decision Records
-└── 09-reference/      Standards & References
-
-terraform/
-images/
-scripts/
-tests/
+├── docs/
+│   ├── 01-business/       Business Discovery & Requirements
+│   ├── 02-strategy/       Cloud Strategy
+│   ├── 03-architecture/   Architecture Design
+│   ├── 04-governance/     Governance Framework
+│   ├── 08-decisions/      Architecture Decision Records
+│   ├── 09-reference/      Reference Architectures
+│   └── 10-terraform/      Terraform Documentation
+│
+├── terraform/              Infrastructure as Code
+├── images/                 Architecture & documentation assets
+├── scripts/                Supporting scripts
+└── tests/                  Validation & test assets
 ```
 
-This structure reflects the progression from business requirements to technical implementation while keeping documentation organized by architectural domain.
+This structure reflects the current repository and separates architecture documentation from implementation.
 
 ---
 
@@ -133,28 +171,35 @@ This structure reflects the progression from business requirements to technical 
 
 ## Current Phase
 
-**Enterprise Cloud Foundation Design**
+**Enterprise Cloud Foundation — Platform Foundation & Governance completed**
 
 ### Progress Overview
 
 | Sprint | Focus | Status |
-|---------|------------------------------|:------:|
+|---|---|:---:|
 | Sprint 1 | Business & Strategy | ✅ Completed |
 | Sprint 2 | Governance | ✅ Completed |
 | Sprint 3 | Architecture Decision Records | ✅ Completed |
-| Sprint 4 | Reference Architectures | 🚧 Planned |
-| Sprint 5 | Terraform Landing Zone | ⏳ Planned |
-| Sprint 6 | Platform Operations | ⏳ Planned |
+| Sprint 4 | Enterprise Reference Architectures | ✅ Completed |
+| Sprint 5 | Terraform Foundation | ✅ Completed |
+| Sprint 6 | Platform Foundation & Governance | ✅ Completed |
+
+### Current Release
+
+**v0.6.0 — Sprint 6 - Platform Foundation & Governance**
 
 ### Completed Deliverables
 
 | Domain | Deliverables | Status |
-|---------|--------------|:------:|
+|---|---|:---:|
 | Business | Enterprise Profile, Business Requirements | ✅ |
 | Strategy | Cloud Strategy | ✅ |
 | Architecture | Architecture Principles, High-Level Architecture, Enterprise Reference Architecture | ✅ |
-| Governance | Governance Framework, Management Groups, Naming & Tagging Standards | ✅ |
+| Governance | Governance Framework, Management Groups, Naming & Tagging Standards, Azure Policy guardrails | ✅ |
 | Decisions | ADR-001 → ADR-010 | ✅ |
+| Reference | Enterprise Landing Zone, Connectivity, and Platform Services reference architectures | ✅ |
+| Terraform | Foundation, remote state, repository architecture, platform, Landing Zones, reusable modules, environment structure, bootstrap | ✅ |
+| Platform | Management, Connectivity, Security, Operations, Identity | ✅ |
 
 ---
 
@@ -197,56 +242,72 @@ This structure reflects the progression from business requirements to technical 
 
 ---
 
-## Sprint 4 — Reference Architectures
+## Sprint 4 — Enterprise Reference Architectures ✅
 
-- Enterprise Landing Zone
-- Identity Architecture
-- Network Architecture
-- Security Architecture
-
----
-
-## Sprint 5 — Terraform Landing Zone
-
-- Enterprise Terraform Modules
-- CI/CD with GitHub Actions
-- Infrastructure Automation
-- Platform Bootstrap
+- Enterprise Landing Zone Reference Architecture
+- Enterprise Connectivity Reference Architecture
+- Enterprise Platform Services Reference Architecture
 
 ---
 
-## Sprint 6 — Platform Operations
+## Sprint 5 — Terraform Foundation ✅
 
-- Monitoring & Observability
-- Operational Runbooks
-- Microsoft Sentinel
-- Final Documentation
-- Version 1.0 Release
+- Terraform foundation
+- Remote state
+- Repository architecture
+- Platform structure
+- Landing Zone structure
+- Reusable modules
+- Environment and deployment structure
+- Terraform bootstrap
 
 ---
+
+## Sprint 6 — Platform Foundation & Governance ✅
+
+- Management capability
+- Connectivity capability
+- Security capability
+- Operations capability
+- Identity capability
+- Reusable policy module
+- Allowed Locations policy
+- Required Tags policy
+- Subscription-level policy assignments
+- Terraform validation and clean plan
+- Terraform foundation documentation
+
+### Release
+
+**v0.6.0 — Sprint 6 - Platform Foundation & Governance**
+
+---
+
 # Guiding Principles
 
-The Azure Enterprise Cloud Foundation is built upon a set of enterprise architecture principles that guide every design and implementation decision.
+The foundation is guided by ten architecture principles:
 
-- Business Before Technology
-- Platform over Projects
-- Infrastructure as Code
-- Security by Design
-- Zero Trust
-- Automation First
-- Standardization over Customization
-- Shared Services First
-- Observability by Default
-- AI Ready
+| ID | Principle |
+|---|---|
+| AP-001 | Business Before Technology |
+| AP-002 | Platform over Projects |
+| AP-003 | Infrastructure as Code |
+| AP-004 | Security by Design |
+| AP-005 | Zero Trust |
+| AP-006 | Automation First |
+| AP-007 | Standardization over Customization |
+| AP-008 | Shared Services First |
+| AP-009 | Observability by Default |
+| AP-010 | AI Ready |
 
-These principles ensure consistency, scalability, security, and long-term maintainability across the platform.
+These principles guide architecture and implementation decisions across the foundation.
 
 ---
 
 # Technology Stack
 
 | Domain | Technologies |
-|---------|--------------|
+|---|---|
 | Cloud Platform | Microsoft Azure |
 | Infrastructure as Code | Terraform |
 | Identity | Microsoft Entra ID |
@@ -260,12 +321,12 @@ These principles ensure consistency, scalability, security, and long-term mainta
 
 # Architecture Decision Records
 
-Architecture decisions are documented using **Architecture Decision Records (ADR)** to ensure transparency, consistency, and long-term maintainability.
+Architecture decisions are documented as **Architecture Decision Records (ADR)** to provide traceability and a clear rationale for major architectural choices.
 
-The repository currently includes **10 ADRs** covering the core design decisions of the Azure Enterprise Cloud Foundation.
+The repository contains **10 ADRs** covering the core decisions of the foundation.
 
 | ADR | Decision |
-|-----|----------|
+|---|---|
 | ADR-001 | Enterprise Landing Zone Architecture |
 | ADR-002 | Hub & Spoke Network Architecture |
 | ADR-003 | Terraform as Infrastructure as Code |
@@ -277,52 +338,34 @@ The repository currently includes **10 ADRs** covering the core design decisions
 | ADR-009 | Enterprise Naming Convention Standard |
 | ADR-010 | Enterprise Tagging Strategy |
 
-Each ADR documents:
-
-- Business Context
-- Decision
-- Decision Drivers
-- Expected Benefits
-- Alternatives Considered
-- Consequences
-- Related Architecture Decisions
-
-This approach provides a clear rationale for every major architectural choice and supports future evolution of the platform.
+The ADRs document the context, decision, drivers, alternatives, consequences, and relationships relevant to each major decision.
 
 ---
 
 # Repository Goals
 
-The Azure Enterprise Cloud Foundation demonstrates how an enterprise cloud platform is designed from business strategy to production-ready implementation.
+The Azure Enterprise Cloud Foundation demonstrates how an enterprise Azure platform can be designed from business strategy through to Infrastructure as Code.
 
-The project aims to showcase:
+It aims to showcase:
 
-- Enterprise Architecture practices
+- Enterprise Architecture
 - Azure Cloud Governance
 - Secure Platform Design
 - Enterprise Networking
 - Infrastructure as Code
 - Platform Engineering
 - Operational Excellence
-- Well-documented architectural decisions
+- Architectural traceability
 
-The long-term objective is to provide a realistic, production-inspired Azure Cloud Foundation that reflects enterprise design practices while remaining understandable, reproducible, and extensible.
+The implementation is intentionally **production-inspired**, not a claim of production deployment. The goal is to demonstrate sound enterprise architecture and engineering practices while keeping the solution understandable and maintainable.
 
 ---
+
 # What's Next
 
-The next phase of the project focuses on transforming the documented enterprise architecture into a production-inspired Azure Landing Zone implemented with Infrastructure as Code.
+The next phase focuses on extending the established platform foundation toward workload-ready Azure Landing Zones.
 
-Upcoming work includes:
-
-- Enterprise Reference Architectures
-- Azure Landing Zone Design
-- Enterprise Terraform Modules
-- CI/CD with GitHub Actions
-- Platform Automation
-- Monitoring & Operational Excellence
-
-The long-term objective is to deliver a complete Azure Enterprise Cloud Foundation that demonstrates enterprise architecture, governance, security, networking, and platform engineering from strategy to implementation.
+Upcoming work will build on the completed architecture, Terraform foundation, Platform Capabilities, and governance guardrails while keeping the implementation pragmatic and aligned with the project's architecture principles.
 
 ---
 
@@ -330,7 +373,7 @@ The long-term objective is to deliver a complete Azure Enterprise Cloud Foundati
 
 This repository is primarily a personal learning and portfolio project.
 
-Suggestions, feedback, and discussions about Azure architecture, governance, Infrastructure as Code, and platform engineering are always welcome.
+Suggestions, feedback, and discussions about Azure architecture, governance, Infrastructure as Code, and platform engineering are welcome.
 
 If you have ideas for improvements, feel free to open an issue or submit a pull request.
 
