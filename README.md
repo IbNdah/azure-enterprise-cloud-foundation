@@ -153,9 +153,9 @@ azure-enterprise-cloud-foundation/
 │   ├── 02-strategy/       Cloud Strategy
 │   ├── 03-architecture/   Architecture Design
 │   ├── 04-governance/     Governance Framework
-│   ├── 08-decisions/      Architecture Decision Records
-│   ├── 09-reference/      Reference Architectures
-│   └── 10-terraform/      Terraform Documentation
+│   ├── 05-decisions/      Architecture Decision Records
+│   ├── 06-reference/      Reference Architectures
+│   └── 07-terraform/      Terraform Documentation
 │
 ├── terraform/              Infrastructure as Code
 ├── images/                 Architecture & documentation assets

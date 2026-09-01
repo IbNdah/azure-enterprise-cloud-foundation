@@ -67,7 +67,7 @@ This architecture covers:
 - monitoring and operations;
 - business workload boundaries.
 
-Detailed Terraform implementation is documented separately in `10-terraform`.
+Detailed Terraform implementation is documented separately in `07-terraform`.
 
 ---
 

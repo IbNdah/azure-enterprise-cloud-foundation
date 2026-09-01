@@ -313,7 +313,7 @@ Terraform
     └── Connectivity Resources
 ```
 
-The detailed implementation is maintained under `10-terraform`.
+The detailed implementation is maintained under `07-terraform`.
 
 ---
 

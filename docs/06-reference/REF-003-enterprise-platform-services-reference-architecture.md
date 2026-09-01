@@ -334,7 +334,7 @@ Terraform Root
            └── Sandbox
 ```
 
-This is an implementation alignment view. The detailed Terraform structure and deployment process are documented under `10-terraform`.
+This is an implementation alignment view. The detailed Terraform structure and deployment process are documented under `07-terraform`.
 
 ---
 

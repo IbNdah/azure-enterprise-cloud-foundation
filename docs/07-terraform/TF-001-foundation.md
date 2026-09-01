@@ -318,7 +318,7 @@ It does not define:
 - complete deployment procedures;
 - application deployment pipelines.
 
-These topics are covered by the other documents in `10-terraform`.
+These topics are covered by the other documents in `07-terraform`.
 
 ---
 
