@@ -1,24 +1,25 @@
 # Business Requirements
 
-**Document ID:** BUS-002
-**Version:** 1.0
-**Status:** Draft
-**Author:** Cloud Center of Excellence (CCoE)
-**Classification:** Internal Use Only
+| **Document ID** | BUS-002 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Author** | Cloud Center of Excellence (CCoE) |
+| **Classification** | Internal Use Only |
 
 ---
 
-# Purpose
+# 1. Purpose
 
 This document defines the high-level business requirements that drive the OneCloud 2030 transformation program.
 
-These requirements serve as the foundation for all architectural decisions, governance policies, security controls, and Infrastructure as Code (IaC) implementations within the Azure Enterprise Cloud Foundation.
+These requirements serve as the foundation for architectural decisions, governance policies, security controls, and Infrastructure as Code (IaC) implementations within the Azure Enterprise Cloud Foundation.
 
-Every technical decision documented throughout this project must be traceable to one or more business requirements defined in this document.
+Technical decisions documented throughout this project should be traceable to one or more business requirements defined in this document.
 
 ---
 
-# Executive Summary
+# 2. Executive Summary
 
 Mandara Global has initiated the OneCloud 2030 transformation program to modernize its global IT landscape and establish a standardized cloud operating model.
 
@@ -28,26 +29,24 @@ These requirements guide the design of the Azure Enterprise Cloud Foundation and
 
 ---
 
-# Business Requirements
+# 3. Business Requirements
 
 | ID | Business Requirement | Priority |
-|----|----------------------|----------|
+|---|---|---|
 | BR-001 | Standardize cloud governance across all Business Units | Critical |
 | BR-002 | Reduce infrastructure provisioning time through automation | High |
-| BR-003 | Strengthen enterprise security using a Zero Trust approach | Critical |
+| BR-003 | Strengthen enterprise security and access control | Critical |
 | BR-004 | Improve cloud cost transparency and financial governance | High |
-| BR-005 | Enable a scalable multi-subscription cloud operating model | Critical |
+| BR-005 | Support a scalable cloud operating model with appropriate workload and administrative boundaries | Critical |
 | BR-006 | Establish Infrastructure as Code as the standard deployment model | Critical |
 | BR-007 | Support global business expansion through a scalable cloud platform | High |
-| BR-008 | Provide a secure foundation for AI and future digital platforms | High |
+| BR-008 | Provide a secure and scalable foundation for future AI workloads | High |
 | BR-009 | Improve operational visibility through centralized monitoring and observability | High |
 | BR-010 | Establish a Cloud Center of Excellence to govern cloud adoption | Critical |
 
 ---
 
-# Requirement Details
-
----
+# 4. Requirement Details
 
 ## BR-001 – Standardize Cloud Governance
 
@@ -92,10 +91,10 @@ Mandara Global requires a security model capable of protecting enterprise worklo
 
 ### Success Criteria
 
-- Zero Trust principles
 - Centralized identity management
 - Least privilege access
 - Continuous security monitoring
+- Security controls aligned with enterprise requirements
 
 ---
 
@@ -126,9 +125,10 @@ The platform must support future acquisitions, new Business Units, and internati
 
 ### Success Criteria
 
-- Multi-subscription architecture
+- Scalable subscription model
 - Standard onboarding process
-- Scalable management hierarchy
+- Scalable governance hierarchy
+- Clear workload and administrative boundaries
 
 ---
 
@@ -142,9 +142,11 @@ Manual deployments increase operational risk and reduce consistency.
 
 ### Success Criteria
 
-- Terraform as enterprise standard
-- Version-controlled infrastructure
-- Automated deployment pipelines
+- Version-controlled Infrastructure as Code
+- Repeatable automated deployments
+- Controlled change and auditability
+
+The specific IaC technology is defined through the architecture decision process.
 
 ---
 
@@ -158,8 +160,8 @@ The cloud platform must support new regions and future business growth.
 
 ### Success Criteria
 
-- Region-independent architecture
-- Standard landing zones
+- Support deployment across multiple Azure regions
+- Standard Landing Zone model
 - Global connectivity model
 
 ---
@@ -174,8 +176,8 @@ Mandara Global plans to accelerate AI adoption across multiple Business Units.
 
 ### Success Criteria
 
-- Secure AI platform integration
-- Scalable shared services
+- Secure and scalable foundation for AI workloads
+- Shared platform services
 - Enterprise-ready architecture
 
 ---
@@ -216,9 +218,9 @@ Cloud adoption must be governed by a dedicated enterprise organization responsib
 
 ---
 
-# Requirement Traceability
+# 5. Requirement Traceability
 
-The business requirements defined in this document will be referenced throughout the Azure Enterprise Cloud Foundation.
+The business requirements defined in this document are referenced throughout the Azure Enterprise Cloud Foundation.
 
 ```text
 Business Requirements
@@ -233,19 +235,43 @@ Architecture Principles
 Architecture Decisions (ADR)
         │
         ▼
+Governance
+        │
+        ▼
 Terraform Implementation
         │
         ▼
 Validation & Operations
 ```
 
-This traceability ensures that every architectural decision remains aligned with business objectives.
+| Requirement | Primary architectural areas |
+|---|---|
+| BR-001 | Governance, Management Groups, Azure Policy |
+| BR-002 | Infrastructure as Code, Platform Engineering |
+| BR-003 | Security, Identity, RBAC |
+| BR-004 | Governance, Cost Management |
+| BR-005 | Management Groups, Subscriptions, Landing Zones |
+| BR-006 | Terraform, CI/CD |
+| BR-007 | Landing Zones, Connectivity |
+| BR-008 | Platform Architecture |
+| BR-009 | Management, Operations, Monitoring |
+| BR-010 | Governance, Architecture |
+
+This mapping identifies the primary areas addressed by each requirement. Detailed traceability to individual ADRs and implementation components is maintained in the relevant architecture and governance documents.
 
 ---
 
-# Key Takeaways
+# 6. Requirement Governance
 
-- Business requirements drive all architecture decisions.
+Business requirements should remain stable unless the underlying business objective changes.
+
+Changes to requirements should be reviewed by the Cloud Center of Excellence and reflected in affected strategy, architecture, governance and implementation documents.
+
+---
+
+# 7. Key Takeaways
+
+- Business requirements drive architecture decisions.
 - Technology choices must support measurable business outcomes.
-- Every future document will reference one or more Business Requirements.
-- Infrastructure as Code, Governance, Security, and Platform Engineering are strategic business enablers—not isolated technical initiatives.
+- Requirements are traced to the relevant architecture, governance and implementation areas.
+- Infrastructure as Code, governance, security and platform engineering support the business objectives of OneCloud 2030.

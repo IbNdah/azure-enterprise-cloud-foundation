@@ -1,10 +1,11 @@
 # Enterprise Profile
 
-**Document ID:** 01-BUS-001
-**Version:** 1.0
-**Status:** Draft
-**Author:** Cloud Center of Excellence (CCoE)
-**Classification:** Internal Use Only
+| **Document ID** | 01-BUS-001 |
+|---|---|
+| **Version** | 1.1 |
+| **Status** | Approved |
+| **Author** | Cloud Center of Excellence (CCoE) |
+| **Classification** | Internal Use Only |
 
 ---
 
@@ -23,7 +24,7 @@ This document provides an overview of the organization, its business model, stra
 # Company Overview
 
 | Property | Value |
-|----------|-------|
+|---|---|
 | Company | Mandara Global |
 | Industry | Industrial Technology |
 | Headquarters | Munich, Germany |
