@@ -36,9 +36,16 @@ module "workload_resource_group" {
   location = var.location
 
   tags = merge(
-    var.tags,
-    {
-      LandingZone = "Online"
-    }
-  )
+  {
+    Organization = "Mandara Global"
+    Project      = "Azure Enterprise Cloud Foundation"
+    BusinessUnit = "OneCloud"
+    Department   = "IT"
+    ManagedBy    = "Terraform"
+  },
+  var.tags,
+  {
+    LandingZone = "Online"
+  }
+ )
 }
