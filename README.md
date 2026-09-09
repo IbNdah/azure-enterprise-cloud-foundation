@@ -171,7 +171,9 @@ This structure reflects the current repository and separates architecture docume
 
 ## Current Phase
 
-**Enterprise Cloud Foundation — Platform Foundation & Governance completed**
+**Sprint 8 — Connectivity / Integration**
+
+Sprints 1–7 are completed. Sprint 8 extends and validates the frozen enterprise architecture without redesigning it.
 
 ### Progress Overview
 
@@ -183,10 +185,16 @@ This structure reflects the current repository and separates architecture docume
 | Sprint 4 | Enterprise Reference Architectures | ✅ Completed |
 | Sprint 5 | Terraform Foundation | ✅ Completed |
 | Sprint 6 | Platform Foundation & Governance | ✅ Completed |
+| Sprint 7 | Landing Zones | ✅ Completed |
+| Sprint 8 | Connectivity / Integration | 🔄 In Progress |
 
 ### Current Release
 
-**v0.6.0 — Sprint 6 - Platform Foundation & Governance**
+**v0.7.0 — Sprint 7 - Landing Zones**
+
+### Target Release
+
+**v0.8.0 — Sprint 8 - Connectivity / Integration**
 
 ### Completed Deliverables
 
@@ -200,6 +208,8 @@ This structure reflects the current repository and separates architecture docume
 | Reference | Enterprise Landing Zone, Connectivity, and Platform Services reference architectures | ✅ |
 | Terraform | Foundation, remote state, repository architecture, platform, Landing Zones, reusable modules, environment structure, bootstrap | ✅ |
 | Platform | Management, Connectivity, Security, Operations, Identity | ✅ |
+| Landing Zones | Corp, Online, Sandbox workload boundaries and Terraform roots | ✅ |
+| Sprint 8 | Connectivity architecture, integration patterns, governance, validation and release readiness | 🔄 |
 
 ---
 
@@ -283,6 +293,95 @@ This structure reflects the current repository and separates architecture docume
 
 ---
 
+## Sprint 7 — Landing Zones ✅
+
+- Landing Zone architecture
+- Corp Landing Zone
+- Online Landing Zone
+- Sandbox Landing Zone
+- Landing Zone governance
+- Workload boundary model
+- Terraform Landing Zone implementation
+
+### Release
+
+**v0.7.0 — Sprint 7 - Landing Zones**
+
+---
+
+## Sprint 8 — Connectivity / Integration 🔄
+
+Sprint 8 extends the frozen enterprise architecture without introducing an architectural redesign.
+
+### Connectivity Architecture
+
+- Hub & Spoke connectivity validation
+- VNet and subnet model
+- Inter-Landing Zone connectivity patterns
+- Routing and traffic-path principles
+- Internet ingress and egress
+- Connectivity security boundaries
+
+### Hybrid Connectivity
+
+- VPN connectivity pattern
+- ExpressRoute connectivity pattern
+- Hybrid routing
+- Hybrid DNS
+
+### Private Connectivity
+
+- Private Endpoint
+- Private DNS
+- Service Endpoint as an alternative where appropriate
+- Private PaaS access patterns
+
+### Integration Patterns
+
+- Network connectivity
+- Private service connectivity
+- API integration
+- Event-driven integration
+- Messaging patterns
+- Event Hubs, Event Grid and Service Bus decision guidance
+
+### Connectivity Governance
+
+- Platform Team ownership
+- Landing Zone ownership
+- Connectivity request and approval model
+- Connectivity as Code
+- Least privilege and deny-by-default
+- Monitoring and lifecycle management
+
+### Validation & Release Readiness
+
+- Failure scenarios
+- Blast-radius analysis
+- Architecture consistency check
+- Documentation audit
+- Terraform traceability
+- Cross-document consistency
+- Release readiness
+
+### Target Release
+
+**v0.8.0 — Sprint 8 - Connectivity / Integration**
+
+---
+
+## Sprint 9 — Security / Governance Hardening
+
+Planned.
+
+---
+
+## Sprint 10 — Final Architecture
+
+Planned.
+
+---
+
 # Guiding Principles
 
 The foundation is guided by ten architecture principles:
@@ -363,11 +462,22 @@ The implementation is intentionally **production-inspired**, not a claim of prod
 
 # What's Next
 
-The next phase focuses on extending the established platform foundation toward workload-ready Azure Landing Zones.
+The current phase is **Sprint 8 — Connectivity / Integration**.
 
-Upcoming work will build on the completed architecture, Terraform foundation, Platform Capabilities, and governance guardrails while keeping the implementation pragmatic and aligned with the project's architecture principles.
+Sprint 8 focuses on validating and documenting enterprise connectivity and integration patterns across the established Landing Zones and shared Platform capabilities.
 
----
+The work builds on the frozen S1–S7 architecture and covers:
+
+- Hub & Spoke connectivity
+- Hybrid connectivity patterns
+- Private PaaS access
+- DNS and name resolution
+- Network and application integration patterns
+- Connectivity governance
+- Failure scenarios and blast-radius validation
+- Documentation and Terraform traceability
+
+The target outcome is **v0.8.0 — Sprint 8 - Connectivity / Integration**.
 
 # Contributing
 

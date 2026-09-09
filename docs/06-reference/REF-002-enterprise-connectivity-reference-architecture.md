@@ -12,230 +12,248 @@
 | **Organization** | Mandara Global |
 | **Category** | Networking |
 
----
 
-# 1. Executive Summary
 
-Mandara Global uses a centralized enterprise networking model based on **Azure Hub & Spoke architecture**.
+## 1. Executive Summary
 
-The Hub provides shared connectivity and network security services, while workload environments are deployed into isolated Spoke Virtual Networks.
+Mandara Global adopts a centralized Azure Hub-and-Spoke connectivity model. The Hub provides shared connectivity and network security services, while workload environments are deployed in isolated Spoke VNets.
 
-The connectivity architecture supports the enterprise Landing Zone model and provides controlled connectivity between workloads, shared platform services and on-premises environments.
+The architecture supports the enterprise Landing Zone model and controlled connectivity between workloads, shared platform services and on-premises environments.
 
 ---
 
-# 2. Purpose
+## 2. Purpose
 
-This reference architecture provides the standard connectivity model for Azure Landing Zones.
+This reference architecture defines the standard connectivity model for Azure Landing Zones.
 
-It establishes a common pattern for:
+It covers:
 
-- centralized connectivity;
-- workload network isolation;
-- hybrid connectivity;
-- private access to Azure services;
-- centralized traffic inspection;
-- private DNS resolution;
-- controlled network administration.
+- centralized connectivity
+- workload network isolation
+- hybrid connectivity
+- private access to Azure services
+- centralized traffic inspection
+- private DNS resolution
+- controlled ingress and egress
+- controlled network administration
 
-It is a reference architecture rather than a detailed implementation specification.
-
----
-
-# 3. Scope
-
-This architecture covers:
-
-- Hub Virtual Network;
-- Spoke Virtual Networks;
-- Azure Firewall;
-- VPN Gateway;
-- ExpressRoute Gateway;
-- Private DNS;
-- Private Endpoints;
-- Virtual Network Peering;
-- Azure Bastion;
-- connectivity between Landing Zones and shared platform services.
+This document defines a reference architecture and target pattern; it is not a detailed workload implementation.
 
 ---
 
-# 4. Architecture Overview
+## 3. Scope
 
-The network architecture separates shared connectivity services from workload networks.
+This reference architecture covers:
 
-The **Hub Virtual Network** provides centralized connectivity and security services.
+- Hub VNet
+- Spoke VNets
+- Azure Firewall
+- VPN Gateway
+- ExpressRoute Gateway
+- Private DNS
+- Private Endpoints
+- VNet Peering
+- Azure Bastion
+- Web Application Firewall (WAF) where applicable
+- connectivity between Landing Zones and shared platform services
 
-**Spoke Virtual Networks** provide network boundaries for workloads deployed through Landing Zones.
+---
 
-The connectivity model is aligned with the Landing Zone structure:
+## 4. Architecture Overview
 
 ```text
 Enterprise Platform
         │
         ▼
- Connectivity Capability
+Connectivity Capability
         │
         ▼
      Hub VNet
         │
-        ├───────────────┬───────────────┐
-        ▼               ▼               ▼
-     Corp Spokes     Online Spokes   Sandbox Spokes
-        │               │               │
-        ▼               ▼               ▼
-    Workloads        Workloads       Workloads
+   ┌────┼────┐
+   │    │    │
+ Corp Online Sandbox
+ Spokes Spokes Spokes
+   │    │    │
+   ▼    ▼    ▼
+Workloads
 ```
 
 A Landing Zone and a Spoke are related but are not synonymous architectural concepts. The Landing Zone defines the governed workload environment; the Spoke provides its network boundary.
 
 ---
 
-# 5. High-Level Architecture
+## 5. High-Level Architecture
 
 ```text
-                         On-Premises
-                              │
-                     VPN / ExpressRoute
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │    Hub VNet      │
-                    │                  │
-                    │ Azure Firewall   │
-                    │ Private DNS      │
-                    │ Bastion          │
-                    └────────┬─────────┘
-                             │
-                ┌────────────┼────────────┐
-                │            │            │
-                ▼            ▼            ▼
-           Corp Spokes   Online Spokes  Sandbox Spokes
-                │            │            │
-                ▼            ▼            ▼
-            Workloads     Workloads     Workloads
+                    ON-PREMISES
+                         │
+                    VPN / ER
+                         │
+                         ▼
+                    ┌─────────┐
+                    │   HUB   │
+                    │         │
+                    │ Firewall│
+                    │ DNS     │
+                    │ Bastion │
+                    └────┬────┘
+                         │
+              ┌──────────┼──────────┐
+              │          │          │
+           CORP       ONLINE     SANDBOX
+           SPOKE       SPOKE       SPOKE
+              │          │          │
+              ▼          ▼          ▼
+          Workloads   Workloads  Workloads
 ```
 
 The Hub is the shared connectivity boundary. Spokes provide workload isolation.
 
 Not every workload requires identical connectivity. Network paths should be established according to workload requirements and enterprise security controls.
 
+Internet-facing workloads must use an explicitly approved ingress pattern, with WAF or equivalent application-layer protection where applicable. Internet-bound traffic should use governed egress paths where centralized inspection is required.
+
 ---
 
-# 6. Core Components
+## 6. Core Components
 
 | Component | Purpose |
 |---|---|
-| **Hub VNet** | Central connectivity and shared network services |
-| **Spoke VNet** | Isolated network boundary for a workload environment |
-| **Azure Firewall** | Central traffic inspection and control |
-| **VPN Gateway** | Secure hybrid connectivity |
-| **ExpressRoute Gateway** | Dedicated private enterprise connectivity |
-| **Private DNS** | Private name resolution for supported services |
-| **Private Endpoint** | Private access to supported Azure PaaS services |
-| **VNet Peering** | Connectivity between Hub and Spokes |
-| **Azure Bastion** | Controlled administrative access to supported virtual machines |
+| Hub VNet | Central connectivity and shared network services |
+| Spoke VNet | Isolated network boundary for a workload environment |
+| Azure Firewall | Central traffic inspection and control |
+| VPN Gateway | Secure hybrid connectivity |
+| ExpressRoute Gateway | Dedicated private enterprise connectivity |
+| Private DNS | Private name resolution for supported services |
+| Private Endpoint | Private access to supported Azure PaaS services |
+| VNet Peering | Connectivity between Hub and Spokes |
+| Azure Bastion | Controlled administrative access to supported VMs |
+| Web Application Firewall | Application-layer protection for applicable internet-facing workloads |
 
 ---
 
-# 7. Network Design Principles
+## 7. Network Design Principles
 
-| Principle | Application |
+| Principle | Description |
 |---|---|
-| **Hub & Spoke** | Centralize shared connectivity services |
-| **Network Segmentation** | Maintain workload boundaries |
-| **Centralized Security** | Inspect and control relevant traffic through shared services |
-| **Private by Preference** | Prefer private connectivity where it provides a meaningful benefit |
-| **Least Connectivity Required** | Expose only required network paths |
-| **Shared Services** | Reuse common connectivity services |
-| **Controlled Routing** | Define predictable traffic paths |
-| **Scalability** | Support additional Landing Zones and workloads |
+| Hub & Spoke | Centralize shared connectivity services |
+| Network Segmentation | Maintain workload boundaries |
+| Centralized Security | Inspect/control relevant traffic through shared services |
+| Private by Preference | Prefer private connectivity where it provides a meaningful security or architectural benefit |
+| Least Connectivity Required | Expose only required network paths |
+| Controlled Routing | Define predictable traffic paths |
+| Controlled Egress | Govern outbound Internet traffic according to workload requirements and enterprise security controls |
+| Shared Services | Reuse common connectivity services |
+| Scalability | Support additional Landing Zones and workloads |
 
 ---
 
-# 8. Connectivity Flow
+## 8. Connectivity Flow
 
-A typical hybrid connectivity flow is:
+### 8.1 Hybrid Connectivity
 
 ```text
 On-Premises
      │
-     ▼
-VPN / ExpressRoute
+ VPN / ExpressRoute
      │
      ▼
-Hub Virtual Network
+    Hub
+     │
+ Azure Firewall
+ (where inspection is required)
      │
      ▼
-Azure Firewall
+   Spoke
      │
      ▼
-Spoke Virtual Network
-     │
-     ▼
-Application Workload
+  Workload
 ```
 
-A typical private PaaS access flow is:
+### 8.2 Private PaaS Connectivity
 
 ```text
 Workload
-   │
-   ▼
+    │
+    ▼
 Spoke VNet
-   │
-   ▼
+    │
+    ▼
 Private Endpoint
-   │
-   ▼
-Azure PaaS Service
+    │
+    ▼
+Azure PaaS
 ```
 
-Private DNS provides the required private name resolution where applicable.
+Private DNS provides private name resolution where applicable.
+
+### 8.3 Internet Ingress
+
+```text
+Internet
+    │
+    ▼
+Approved Ingress / Edge
+    │
+    ▼
+WAF (where applicable)
+    │
+    ▼
+Online Workload
+```
+
+### 8.4 Internet Egress
+
+```text
+Workload
+    │
+    ▼
+Spoke
+    │
+    ▼
+Centralized Egress / Inspection
+(where required)
+    │
+    ▼
+Internet
+```
 
 ---
 
-# 9. Landing Zone Connectivity
-
-Connectivity is provided according to the Landing Zone type and workload requirements.
+## 9. Landing Zone Connectivity
 
 | Landing Zone | Network Model | Typical Use |
 |---|---|---|
-| **Corp** | Spoke-based connectivity through the Hub | Internal enterprise workloads |
-| **Online** | Spoke-based connectivity with controlled external access | Internet-facing workloads |
-| **Sandbox** | Isolated Spoke connectivity with controlled access | Experimentation and development |
+| Corp | Spoke-based connectivity through Hub | Internal enterprise workloads |
+| Online | Spoke-based connectivity with controlled external access | Internet-facing workloads |
+| Sandbox | Isolated Spoke connectivity with controlled access | Experimentation/development |
 
-The Landing Zone classification does not determine every network rule. Specific workload requirements may require additional controls.
+Landing Zone classification does not determine every network rule; workload requirements may require additional controls.
 
 ---
 
-# 10. Workload Isolation
-
-Each workload environment should have an appropriate network boundary.
-
-The default model is:
+## 10. Workload Isolation
 
 ```text
-                    Hub VNet
-                       │
-          ┌────────────┼────────────┐
-          │            │            │
-          ▼            ▼            ▼
-       Spoke A      Spoke B      Spoke C
-          │            │            │
-       Workload A   Workload B   Workload C
+                 HUB
+                  │
+        ┌─────────┼─────────┐
+        │         │         │
+      Spoke A   Spoke B   Spoke C
+        │         │         │
+     Workloads Workloads Workloads
 ```
 
-Direct spoke-to-spoke communication is not permitted by default.
-
-Where communication is required, the path must be explicitly designed and controlled.
+Direct spoke-to-spoke communication is not permitted by default. Where required, the path must be explicitly designed and controlled.
 
 ---
 
-# 11. Private Connectivity
+## 11. Private Connectivity
 
 Private connectivity is preferred for supported Azure services when it provides a meaningful security or architectural benefit.
 
-The standard pattern is:
+### Pattern
 
 ```text
 Spoke VNet
@@ -247,116 +265,150 @@ Private Endpoint
 Private Link
     │
     ▼
-Azure PaaS Service
+Azure PaaS
 ```
 
-Private DNS is used to provide appropriate name resolution for private endpoints.
+Private DNS is used for appropriate name resolution.
 
-This follows the principle established in **ADR-005**: private connectivity is a preference, not an absolute requirement for every service or scenario.
+This approach follows **ADR-005**: private connectivity is a preference, not an absolute requirement for every service or scenario.
 
 ---
 
-# 12. Hybrid Connectivity
+## 12. Hybrid Connectivity
 
-The architecture supports enterprise connectivity to on-premises environments through:
+The architecture supports on-premises connectivity through:
 
-- VPN Gateway;
-- ExpressRoute Gateway.
+- VPN Gateway
+- ExpressRoute Gateway
 
-The Hub acts as the central connectivity point.
+The Hub is the central connectivity point.
 
 The choice between VPN and ExpressRoute depends on enterprise connectivity requirements and is outside the scope of this reference architecture.
 
 ---
 
-# 13. Security and Administration
+## 13. Security and Administration
 
 Network security is supported through:
 
-- Azure Firewall;
-- Network Security Groups where appropriate;
-- controlled routing;
-- private connectivity;
-- Azure Bastion for supported administrative scenarios.
+- Azure Firewall
+- NSGs where appropriate
+- controlled routing
+- private connectivity
+- Azure Bastion for supported administrative scenarios
+- Web Application Firewall for applicable internet-facing workloads
 
-Network controls complement the enterprise security baseline defined in **ADR-008**.
+Network controls complement **ADR-008 Enterprise Security Baseline**.
 
 ---
 
-# 14. Decision Boundaries
+## 14. Ownership and Governance
+
+The **Platform Team** owns and governs shared connectivity capabilities, including:
+
+- the Hub
+- centralized network security services
+- shared DNS capabilities
+- hybrid connectivity
+
+**Landing Zone owners** remain responsible for their Landing Zones and workloads within established platform guardrails.
+
+Connectivity changes are implemented through **Infrastructure as Code** and are subject to the applicable governance and approval process.
+
+Connectivity is governed according to least-privilege and deny-by-default principles. Exceptions require explicit justification and approval.
+
+### Governance Model
+
+```text
+Workload Team
+      │
+      │ Connectivity Requirement
+      ▼
+ Request / IaC
+      │
+      ▼
+Platform Governance
+      │
+      ▼
+ Approved Connectivity
+      │
+      ▼
+ Terraform
+      │
+      ▼
+   Azure
+```
+
+---
+
+## 15. Decision Boundaries
 
 This reference architecture defines the target connectivity pattern but does not prescribe:
 
-- every subnet address range;
-- every NSG rule;
-- every route;
-- every workload firewall rule;
-- application-specific network requirements.
+- every subnet range
+- every NSG rule
+- every route
+- every workload firewall rule
+- application-specific network requirements
 
-Those details belong to the relevant Landing Zone or workload implementation.
-
----
-
-# 15. Implementation Alignment
-
-The connectivity architecture is implemented through reusable Terraform capabilities and modules.
-
-Relevant infrastructure patterns include:
-
-```text
-Terraform
-    │
-    ├── Virtual Network
-    ├── Subnet
-    ├── Network Security Group
-    ├── Private Endpoint
-    └── Connectivity Resources
-```
-
-The detailed implementation is maintained under `07-terraform`.
+These details belong to Landing Zone and workload implementation.
 
 ---
 
-# 16. Benefits
+## 16. Implementation Alignment
 
-| Area | Benefit |
-|---|---|
-| Security | Centralized traffic controls and workload isolation |
-| Connectivity | Consistent enterprise network model |
-| Hybrid Integration | Standard private connectivity pattern |
-| Operations | Shared network services |
-| Scalability | Repeatable pattern for additional workloads |
-| Governance | Clear network ownership and boundaries |
-| Workload Onboarding | Reusable connectivity model |
+Connectivity is implemented through reusable Terraform capabilities and modules.
+
+Patterns include:
+
+- Virtual Network
+- Subnet
+- NSG
+- Private Endpoint
+- Connectivity Resources
+
+Detailed implementation is maintained in the repository's Terraform implementation area.
 
 ---
 
-# 17. Related Documents
+## 17. Benefits
+
+- **Security** — Consistent and controlled network boundaries
+- **Connectivity** — Predictable communication paths
+- **Hybrid Integration** — Standardized on-premises connectivity patterns
+- **Operations** — Centralized inspection and governance
+- **Scalability** — Repeatable connectivity for additional Landing Zones and workloads
+- **Governance** — Clear ownership and controlled changes
+- **Workload Onboarding** — Reusable connectivity patterns
+
+---
+
+## 18. Related Documents
 
 ### Architecture
 
-- ARC-002 — High-Level Architecture
-- ARC-003 — Enterprise Reference Architecture
+- ARC-002
+- ARC-003
 
 ### Governance
 
-- GOV-003 — Subscription Strategy
-- GOV-009 — Landing Zone Design
+- GOV-003
+- GOV-009
 
-### Architecture Decisions
+### ADRs
 
-- ADR-002 — Hub & Spoke Network Architecture
-- ADR-005 — Private Networking Strategy
-- ADR-008 — Enterprise Security Baseline
+- ADR-002
+- ADR-005
+- ADR-008
 
 ### Reference Architectures
 
-- REF-001 — Enterprise Landing Zone Reference Architecture
-- REF-003 — Enterprise Platform Services Reference Architecture
+- REF-001
+- REF-003
 
 ---
 
-# 18. References
+## 19. References
 
 - Microsoft Cloud Adoption Framework
 - Azure Landing Zones
@@ -364,3 +416,12 @@ The detailed implementation is maintained under `07-terraform`.
 - Azure Firewall
 - Azure Private Link
 - Azure Architecture Center
+
+---
+
+## Version History
+
+| Version | Date | Change |
+|---|---|---|
+| 1.2 | 2026-09-08 | S8 Documentation Audit alignment: explicit WAF/ingress, controlled egress, Platform/Landing Zone ownership and governance, and Terraform implementation wording. |
+| 1.1 | 2026-09-01 | Approved enterprise connectivity reference architecture. |
