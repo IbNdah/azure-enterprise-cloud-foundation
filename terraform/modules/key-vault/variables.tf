@@ -41,3 +41,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "public_network_access_enabled" {
+  description = "Allow public network access to the Key Vault."
+  type        = bool
+  default     = false
+}

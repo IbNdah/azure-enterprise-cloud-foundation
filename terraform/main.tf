@@ -64,7 +64,10 @@ module "security" {
   tenant_id      = var.tenant_id
   key_vault_name = var.key_vault_name
 
+  log_analytics_workspace_id = module.management.log_analytics_workspace_id
+
   private_endpoint_subnet_id = module.connectivity.private_endpoint_subnet_id
+  virtual_network_id         = module.connectivity.virtual_network_id
 
   tags = merge(
     local.common_tags,

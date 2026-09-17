@@ -9,6 +9,8 @@ resource "azurerm_storage_account" "this" {
   account_kind = var.account_kind
   access_tier  = var.access_tier
 
+  public_network_access_enabled = var.public_network_access_enabled
+
   https_traffic_only_enabled = true
   min_tls_version            = "TLS1_2"
 

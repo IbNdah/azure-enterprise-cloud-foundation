@@ -44,6 +44,12 @@ variable "soft_delete_retention_days" {
   default     = 90
 }
 
+variable "public_network_access_enabled" {
+  description = "Allow public network access to the Key Vault."
+  type        = bool
+  default     = false
+}
+
 ##################################################
 # Private Endpoint
 ##################################################
@@ -61,4 +67,21 @@ variable "tags" {
   description = "Additional platform tags."
   type        = map(string)
   default     = {}
+}
+
+##################################################
+# Virtual Network
+##################################################
+variable "virtual_network_id" {
+  description = "Resource ID of the Hub Virtual Network used for private connectivity."
+  type        = string
+}
+
+##################################################
+# Log Analytics Workspace
+##################################################
+
+variable "log_analytics_workspace_id" {
+  description = "Central Log Analytics Workspace resource ID used for security resource diagnostics."
+  type        = string
 }

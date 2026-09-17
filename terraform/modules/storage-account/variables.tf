@@ -42,3 +42,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "public_network_access_enabled" {
+  description = "Allow public network access to the Storage Account."
+  type        = bool
+  default     = true
+}

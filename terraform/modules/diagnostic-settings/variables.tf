@@ -1,11 +1,14 @@
 variable "name" {
-  type = string
+  description = "Diagnostic settings name."
+  type        = string
 }
 
 variable "target_resource_id" {
-  type = string
+  description = "Resource ID of the resource emitting diagnostics."
+  type        = string
 }
 
 variable "log_analytics_workspace_id" {
-  type = string
+  description = "Log Analytics Workspace resource ID receiving diagnostics."
+  type        = string
 }
