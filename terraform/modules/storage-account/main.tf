@@ -11,6 +11,11 @@ resource "azurerm_storage_account" "this" {
 
   public_network_access_enabled = var.public_network_access_enabled
 
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+  }
+
   https_traffic_only_enabled = true
   min_tls_version            = "TLS1_2"
 
