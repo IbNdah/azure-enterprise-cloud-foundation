@@ -49,3 +49,8 @@ output "managed_identity_principal_id" {
   description = "Managed Identity principal ID."
   value       = module.platform_security_identity.principal_id
 }
+
+output "security_resource_group_id" {
+  description = "Resource ID of the platform security resource group."
+  value       = module.security_resource_group.id
+}

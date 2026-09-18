@@ -117,3 +117,22 @@ module "identity" {
     }
   )
 }
+
+##################################################
+# Azure Policy Remediation RBAC Assignments
+##################################################
+module "policy_remediation_monitoring_role" {
+  source = "./modules/role-assignement"
+
+  principal_id = module.management.security_governance_baseline_principal_id
+  role         = "Monitoring Contributor"
+  scope        = module.security.security_resource_group_id
+}
+
+module "policy_remediation_log_analytics_role" {
+  source = "./modules/role-assignement"
+
+  principal_id = module.management.security_governance_baseline_principal_id
+  role         = "Log Analytics Contributor"
+  scope        = module.management.log_analytics_workspace_id
+}

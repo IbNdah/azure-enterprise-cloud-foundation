@@ -14,14 +14,4 @@ resource "azurerm_policy_definition" "this" {
   parameters = var.parameters
 }
 
-##################################################
-# Policy Assignment
-##################################################
-resource "azurerm_subscription_policy_assignment" "this" {
-  name                 = var.assignment_name
-  display_name         = var.assignment_display_name
-  policy_definition_id = azurerm_policy_definition.this.id
-  subscription_id      = var.subscription_id
 
-  parameters = var.assignment_parameters
-}

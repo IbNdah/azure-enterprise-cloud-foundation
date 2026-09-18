@@ -27,26 +27,3 @@ variable "parameters" {
   default     = null
 }
 
-##################################################
-# Policy Assignment Variables
-##################################################
-variable "assignment_name" {
-  description = "Azure Policy assignment name."
-  type        = string
-}
-
-variable "assignment_display_name" {
-  description = "Azure Policy assignment display name."
-  type        = string
-}
-
-variable "subscription_id" {
-  description = "Subscription ID for the policy assignment."
-  type        = string
-}
-
-variable "assignment_parameters" {
-  description = "Policy assignment parameters."
-  type        = string
-  default     = null
-}
