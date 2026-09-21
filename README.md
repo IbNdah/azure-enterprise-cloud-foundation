@@ -41,66 +41,51 @@ The objective is not simply to deploy Azure resources, but to demonstrate how an
 
 ## Architecture
 
-![Enterprise Architecture](images/architecture-enterprise.png)
+The three views are intentionally read **from left to right in scope**: enterprise structure → shared platform and connectivity → workload integration.
 
-The foundation separates three concerns:
+### 1. Enterprise Architecture
 
-```text
-Azure Tenant
-     │
-     ├── Governance
-     │
-     └── Platform Foundation
-            │
-            ├── Management
-            ├── Connectivity
-            ├── Security
-            ├── Operations
-            └── Identity
-            │
-        Landing Zones
-        ├── LZ-CORP
-        ├── LZ-ONLINE
-        └── LZ-SANDBOX
-            │
-         Workloads
-```
+<p align="center">
+  <img src="images/architecture-enterprise.png" alt="Enterprise Architecture" width="900">
+</p>
 
-**Governance** establishes enterprise-wide controls.
-**Platform Foundation** provides shared capabilities.
-**Landing Zones** provide controlled workload boundaries.
+The enterprise-level view establishes the relationship between governance, the Platform Foundation and the Landing Zones.
 
-The architecture deliberately separates **platform responsibilities from workload responsibilities**.
+### 2. Platform & Connectivity
 
-### Architecture views
+<p align="center">
+  <img src="images/architecture-platform-connectivity.png" alt="Platform and Connectivity" width="900">
+</p>
 
-| View | Purpose |
-|---|---|
-| **Enterprise Architecture** | Overall foundation and Landing Zone model |
-| **Platform & Connectivity** | Platform capabilities, Hub VNet and connectivity patterns |
-| **Workload Integration Boundary** | Foundation, Landing Zone and workload responsibilities |
+This view zooms into the shared platform capabilities and the connectivity model supporting the Landing Zones.
+
+### 3. Workload Integration
+
+<p align="center">
+  <img src="images/architecture-workload-integration.png" alt="Workload Integration" width="900">
+</p>
+
+This view completes the flow by showing how workloads consume the foundation within the Landing Zone boundaries.
+
+For detailed architecture documentation and source diagrams:
 
 - [Final Architecture](docs/03-architecture/final/01-final-architecture.md)
-- [Architecture Diagram Documentation](docs/03-architecture/final/02-final-architecture-diagram.md)
+- [Architecture Diagrams](docs/03-architecture/final/02-final-architecture-diagram.md)
 - [Traceability Matrix](docs/03-architecture/final/04-traceability-matrix.md)
-- [Architecture source diagrams](docs/03-architecture/final/diagrams/)
 
----
 
 ## What I built
 
-### Enterprise Architecture
-
-- Business and cloud strategy
-- Architecture principles
-- 10 Architecture Decision Records
-- Enterprise reference architectures
-- Governance model
-- Architecture-to-implementation traceability
+| Area | Scope |
+|---|---|
+| **Enterprise Architecture** | Business & cloud strategy, architecture principles, 10 ADRs, reference architectures, governance and traceability |
+| **Platform Foundation** | Management, Connectivity, Security, Operations and Identity capabilities |
+| **Landing Zones** | LZ-CORP, LZ-ONLINE and LZ-SANDBOX as workload boundaries |
+| **Connectivity** | Hub-and-Spoke, private connectivity, Private Endpoints and Private DNS |
+| **Security & Governance** | Azure Policy, RBAC, Managed Identity, Key Vault and centralized diagnostics |
+| **Infrastructure as Code** | Reusable Terraform modules, separated deployment scopes and remote state |
 
 ### Platform Foundation
-
-Five shared capabilities:
 
 | Capability | Scope |
 |---|---|
@@ -112,11 +97,11 @@ Five shared capabilities:
 
 ### Landing Zones
 
-Three workload boundaries:
-
-- **LZ-CORP**
-- **LZ-ONLINE**
-- **LZ-SANDBOX**
+| Landing Zone | Purpose |
+|---|---|
+| **LZ-CORP** | Corporate workloads |
+| **LZ-ONLINE** | Online-facing workloads |
+| **LZ-SANDBOX** | Isolated experimentation and sandbox workloads |
 
 The Landing Zone model provides workload isolation while keeping shared enterprise capabilities centralized.
 
@@ -124,19 +109,18 @@ The Landing Zone model provides workload isolation while keeping shared enterpri
 
 The architecture uses a **Hub-and-Spoke** model with private connectivity as the preferred pattern where applicable.
 
-The foundation supports:
-
-- Hub VNet
-- Private Endpoints
-- Private DNS
-- Azure Firewall
-- Azure Bastion
-- VPN Gateway
-- ExpressRoute Gateway
+| Capability | Role |
+|---|---|
+| Hub VNet | Central connectivity boundary |
+| Private Endpoints | Private access to Azure services |
+| Private DNS | Name resolution for private services |
+| Azure Firewall | Central network security |
+| Azure Bastion | Secure administrative access |
+| VPN Gateway | Hybrid connectivity where required |
+| ExpressRoute Gateway | Private enterprise connectivity where required |
 
 Advanced connectivity services are introduced according to workload or enterprise requirements rather than deployed by default.
 
----
 
 ## Infrastructure as Code
 
@@ -164,7 +148,7 @@ The implementation includes reusable modules for resources such as:
 
 Terraform remote state is used to maintain separated deployment scopes.
 
-→ [Terraform documentation](docs/07-terraform/README.md)
+→ [Terraform documentation](terraform/README.md)
 
 ---
 
@@ -172,22 +156,19 @@ Terraform remote state is used to maintain separated deployment scopes.
 
 Security and governance are implemented as part of the foundation rather than added at workload level only.
 
-Key controls include:
-
-- Azure Policy
-- RBAC
-- Managed Identity
-- Key Vault
-- Required resource governance
-- Security and governance baseline
-- Centralized diagnostics and logging
-- Policy remediation with least-privilege RBAC
+| Control | Purpose |
+|---|---|
+| Azure Policy | Resource and location governance |
+| RBAC | Access control and separation of responsibilities |
+| Managed Identity | Identity without embedded credentials |
+| Key Vault | Secure secret and key management |
+| Diagnostics & Logging | Centralized audit and operational visibility |
+| Policy remediation | Automated governance enforcement with least-privilege RBAC |
 
 The governance model also defines ownership, security exceptions and the boundary between platform and workload responsibilities.
 
 → [Security documentation](docs/08-security/)
 
----
 
 ## Technology Stack
 
@@ -261,16 +242,18 @@ Azure Enterprise Cloud Foundation
           Workloads
 ```
 
-The next phase focuses on demonstrating how workload projects consume the existing:
+The next phase focuses on demonstrating how workload projects consume the existing foundation:
 
-- governance
-- networking
-- security
-- identity
-- monitoring
-- Landing Zone boundaries
+| Shared capability | Workload integration |
+|---|---|
+| Governance | Inherited from the Landing Zone |
+| Networking | Connect to approved network boundaries |
+| Security | Consume shared security controls |
+| Identity | Use approved identity patterns |
+| Monitoring | Integrate with shared observability |
+| Landing Zone | Remains the workload boundary |
 
-without recreating enterprise platform capabilities inside each workload.
+Workloads should consume these capabilities rather than recreate enterprise platform services.
 
 ---
 
@@ -279,7 +262,6 @@ without recreating enterprise platform capabilities inside each workload.
 ```text
 azure-enterprise-cloud-foundation/
 │
-├── .github/
 ├── docs/
 │   ├── 01-business/       Business Discovery & Requirements
 │   ├── 02-strategy/       Cloud Strategy
@@ -289,10 +271,11 @@ azure-enterprise-cloud-foundation/
 │   ├── 09-reference/      Enterprise Reference Architectures
 │   └── 10-terraform/      Terraform Documentation
 │
-├── terraform/             Infrastructure as Code
 ├── images/                Architecture & documentation assets
-│
+├── terraform/             Infrastructure as Code
+├── .github/
 └── README.md
+
 ```
 
 The repository separates **architecture documentation, governance decisions and implementation** so that the relationship between them remains traceable.
@@ -310,6 +293,7 @@ It combines enterprise architecture practices with my background in **system int
 The implementation is intentionally **production-inspired**, not a claim of production deployment.
 
 ---
+
 
 ## Disclaimer
 
