@@ -4,501 +4,315 @@
 ![Platform](https://img.shields.io/badge/Platform-Microsoft%20Azure-0078D4)
 ![IaC](https://img.shields.io/badge/IaC-Terraform-7B42BC)
 ![Architecture](https://img.shields.io/badge/Architecture-Enterprise-success)
-![License](https://img.shields.io/badge/License-MIT-green)
 
-> **Enterprise Azure Landing Zone & Cloud Foundation Reference Architecture**
+> **Enterprise Azure Cloud Foundation and Landing Zone reference architecture**
 
-A production-inspired Azure Enterprise Cloud Foundation demonstrating enterprise architecture, governance, security, networking, Infrastructure as Code, and platform engineering based on the fictional multinational company **Mandara Global** and its **OneCloud 2030** transformation program.
+A production-inspired Azure enterprise foundation demonstrating how **architecture, governance, security, networking and Infrastructure as Code** can be combined into a reusable platform for enterprise workloads.
 
----
-
-# Executive Summary
-
-The Azure Enterprise Cloud Foundation is a production-inspired reference implementation of an enterprise cloud platform built on Microsoft Azure.
-
-Rather than focusing solely on Azure infrastructure deployment, this project follows an **Architecture-First** approach where business objectives, cloud strategy, governance, and architecture principles drive technical decisions.
-
-The repository demonstrates how an enterprise cloud platform evolves from business vision to Infrastructure as Code while applying consistent principles for governance, security, networking, and platform engineering.
+The project uses the fictional multinational **Mandara Global** and its **OneCloud 2030** transformation program as the business context.
 
 ---
 
-# Table of Contents
+## What this project demonstrates
 
-- Executive Summary
-- Project Overview
-- Architecture Lifecycle
-- High-Level Architecture
-- Repository Structure
-- Project Status
-- Project Roadmap
-- Guiding Principles
-- Technology Stack
-- Architecture Decision Records
-- Repository Goals
-- What's Next
-- Disclaimer
-
----
-
-# Project Overview
-
-This repository demonstrates how an enterprise organization designs, governs, and implements a modern Azure Cloud Foundation.
-
-Instead of concentrating only on Azure resources, the project emphasizes the complete enterprise architecture lifecycle—from business strategy and governance to Infrastructure as Code and platform capabilities.
-
-The project showcases:
-
-- Enterprise Architecture
-- Cloud Strategy
-- Cloud Governance
-- Security by Design
-- Enterprise Networking
-- Platform Engineering
-- Infrastructure as Code
-- Operational Excellence
-
-The implementation is traceable to documented architecture decisions and governance standards.
-
----
-
-# Architecture Lifecycle
-
-The project follows a structured lifecycle from business intent to implementation:
+The project follows an **architecture-first lifecycle**:
 
 ```text
 Business Requirements
-        │
-        ▼
+        ↓
 Cloud Strategy
-        │
-        ▼
+        ↓
 Architecture Principles
-        │
-        ▼
-High-Level Architecture
-        │
-        ▼
-Governance
-        │
-        ▼
+        ↓
 Architecture Decisions
-        │
-        ▼
-Reference Architectures
-        │
-        ▼
+        ↓
+Reference Architecture
+        ↓
 Terraform Implementation
-        │
-        ▼
-Azure Platform
+        ↓
+Azure Foundation
+        ↓
+Workload Integration
 ```
 
-This structure provides traceability from business objectives through architecture and governance to implementation.
+The objective is not simply to deploy Azure resources, but to demonstrate how an enterprise cloud foundation can be **designed, governed, implemented and traced from architecture to Infrastructure as Code**.
 
 ---
 
-# High-Level Architecture
+## Architecture
 
-The current enterprise model separates governance, shared platform capabilities, and workload Landing Zones.
+![Enterprise Architecture](images/architecture-enterprise.png)
+
+The foundation separates three concerns:
 
 ```text
-                         Tenant Root
-                              │
-                       Mandara Global
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-              ▼               ▼               ▼
-          Governance       Platform      Decommissioned
-                              │
-                    Platform Capabilities
-                              │
-                              ▼
-                       Landing Zones
-                              │
-                    ┌─────────┼─────────┐
-                    │         │         │
-                   Corp     Online    Sandbox
-                    │         │         │
-                    └─────────┼─────────┘
-                              │
-                        Subscriptions
-                              │
-                        Resource Groups
-                              │
-                           Resources
+Azure Tenant
+     │
+     ├── Governance
+     │
+     └── Platform Foundation
+            │
+            ├── Management
+            ├── Connectivity
+            ├── Security
+            ├── Operations
+            └── Identity
+            │
+        Landing Zones
+        ├── LZ-CORP
+        ├── LZ-ONLINE
+        └── LZ-SANDBOX
+            │
+         Workloads
 ```
 
-The five shared Platform Capabilities are:
+**Governance** establishes enterprise-wide controls.
+**Platform Foundation** provides shared capabilities.
+**Landing Zones** provide controlled workload boundaries.
 
-- Management
-- Connectivity
-- Security
-- Operations
-- Identity
+The architecture deliberately separates **platform responsibilities from workload responsibilities**.
 
-**Management Groups and Platform Capabilities are distinct concepts:** Management Groups provide the Azure governance hierarchy, while Platform Capabilities represent shared platform responsibilities and services.
+### Architecture views
+
+| View | Purpose |
+|---|---|
+| **Enterprise Architecture** | Overall foundation and Landing Zone model |
+| **Platform & Connectivity** | Platform capabilities, Hub VNet and connectivity patterns |
+| **Workload Integration Boundary** | Foundation, Landing Zone and workload responsibilities |
+
+- [Final Architecture](docs/03-architecture/final/01-final-architecture.md)
+- [Architecture Diagram Documentation](docs/03-architecture/final/02-final-architecture-diagram.md)
+- [Traceability Matrix](docs/03-architecture/final/04-traceability-matrix.md)
+- [Architecture source diagrams](docs/03-architecture/final/diagrams/)
 
 ---
 
-# Repository Structure
+## What I built
 
-The repository is organized according to enterprise architecture domains and implementation concerns.
+### Enterprise Architecture
+
+- Business and cloud strategy
+- Architecture principles
+- 10 Architecture Decision Records
+- Enterprise reference architectures
+- Governance model
+- Architecture-to-implementation traceability
+
+### Platform Foundation
+
+Five shared capabilities:
+
+| Capability | Scope |
+|---|---|
+| **Management** | Platform management and governance |
+| **Connectivity** | Hub VNet and enterprise connectivity |
+| **Security** | Security controls and key management |
+| **Operations** | Monitoring, logging and diagnostics |
+| **Identity** | Identity and access foundations |
+
+### Landing Zones
+
+Three workload boundaries:
+
+- **LZ-CORP**
+- **LZ-ONLINE**
+- **LZ-SANDBOX**
+
+The Landing Zone model provides workload isolation while keeping shared enterprise capabilities centralized.
+
+### Connectivity
+
+The architecture uses a **Hub-and-Spoke** model with private connectivity as the preferred pattern where applicable.
+
+The foundation supports:
+
+- Hub VNet
+- Private Endpoints
+- Private DNS
+- Azure Firewall
+- Azure Bastion
+- VPN Gateway
+- ExpressRoute Gateway
+
+Advanced connectivity services are introduced according to workload or enterprise requirements rather than deployed by default.
+
+---
+
+## Infrastructure as Code
+
+The foundation is implemented with **Terraform** using reusable modules and separate scopes for platform capabilities, Landing Zones and workload infrastructure.
+
+```text
+terraform/
+├── platform/
+├── landingzones/
+├── environments/
+├── modules/
+└── backend/
+```
+
+The implementation includes reusable modules for resources such as:
+
+- Virtual Networks and Subnets
+- Network Security Groups
+- Resource Groups
+- Key Vault
+- Storage Accounts
+- Log Analytics
+- Monitoring
+- Private Endpoints
+
+Terraform remote state is used to maintain separated deployment scopes.
+
+→ [Terraform documentation](docs/07-terraform/README.md)
+
+---
+
+## Security & Governance
+
+Security and governance are implemented as part of the foundation rather than added at workload level only.
+
+Key controls include:
+
+- Azure Policy
+- RBAC
+- Managed Identity
+- Key Vault
+- Required resource governance
+- Security and governance baseline
+- Centralized diagnostics and logging
+- Policy remediation with least-privilege RBAC
+
+The governance model also defines ownership, security exceptions and the boundary between platform and workload responsibilities.
+
+→ [Security documentation](docs/08-security/)
+
+---
+
+## Technology Stack
+
+| Domain | Technologies |
+|---|---|
+| Cloud | Microsoft Azure |
+| IaC | Terraform |
+| Identity | Microsoft Entra ID |
+| Governance | Management Groups, Azure Policy, RBAC |
+| Networking | Hub & Spoke, Private Link, Private DNS |
+| Security | Key Vault, Managed Identity, Azure Policy |
+| Operations | Azure Monitor, Log Analytics, Managed Grafana |
+| DevOps | GitHub, GitHub Actions |
+| Architecture | Markdown, Draw.io |
+
+---
+
+## Project Status
+
+### Final Architecture Baseline
+
+Sprint 10 is complete and the project is ready for its first final release: `v1.0.0`.
+
+| Phase | Status |
+|---|---|
+| Business & Strategy | ✅ |
+| Governance | ✅ |
+| Architecture Decisions | ✅ |
+| Reference Architecture | ✅ |
+| Terraform Foundation | ✅ |
+| Platform Foundation | ✅ |
+| Landing Zones | ✅ |
+| Connectivity / Integration | ✅ |
+| Security / Governance Hardening | ✅ |
+| Final Architecture | ✅ |
+| Workload Integration | **Next** |
+
+### Releases
+
+| Version | Milestone |
+|---|---|
+| `v0.1.0` | Business & Strategy |
+| `v0.2.0` | Governance |
+| `v0.3.0` | Architecture Decision Records |
+| `v0.4.0` | Enterprise Reference Architectures |
+| `v0.5.0` | Terraform Foundation |
+| `v0.6.0` | Platform Foundation & Governance |
+| `v0.7.0` | Landing Zones |
+| `v0.8.0` | Connectivity / Integration |
+| `v0.9.0` | Security / Governance Hardening |
+| `v1.0.0` | Final Architecture — next release |
+
+> `v0.1.0` through `v0.9.0` are the existing project tags. `v1.0.0` will be created and published after the final architecture baseline is committed.
+
+---
+
+## What's next
+
+The foundation is now ready to be consumed by representative workloads.
+
+```text
+Azure Enterprise Cloud Foundation
+              ↓
+        Landing Zones
+       ┌──────┼──────┐
+       ↓      ↓      ↓
+     CORP   ONLINE  SANDBOX
+       │      │      │
+       └──────┼──────┘
+              ↓
+          Workloads
+```
+
+The next phase focuses on demonstrating how workload projects consume the existing:
+
+- governance
+- networking
+- security
+- identity
+- monitoring
+- Landing Zone boundaries
+
+without recreating enterprise platform capabilities inside each workload.
+
+---
+
+## Repository Structure
 
 ```text
 azure-enterprise-cloud-foundation/
-
+│
+├── .github/
 ├── docs/
 │   ├── 01-business/       Business Discovery & Requirements
 │   ├── 02-strategy/       Cloud Strategy
 │   ├── 03-architecture/   Architecture Design
 │   ├── 04-governance/     Governance Framework
-│   ├── 05-decisions/      Architecture Decision Records
-│   ├── 06-reference/      Reference Architectures
-│   └── 07-terraform/      Terraform Documentation
+│   ├── 08-security/       Security Governance & Hardening
+│   ├── 09-reference/      Enterprise Reference Architectures
+│   └── 10-terraform/      Terraform Documentation
 │
-├── terraform/              Infrastructure as Code
-├── images/                 Architecture & documentation assets
-├── scripts/                Supporting scripts
-└── tests/                  Validation & test assets
+├── terraform/             Infrastructure as Code
+├── images/                Architecture & documentation assets
+│
+└── README.md
 ```
 
-This structure reflects the current repository and separates architecture documentation from implementation.
+The repository separates **architecture documentation, governance decisions and implementation** so that the relationship between them remains traceable.
 
 ---
 
-# Project Status
+## About the project
 
-## Current Phase
+This is a **portfolio architecture project** designed to demonstrate practical skills in:
 
-**Sprint 8 — Connectivity / Integration**
+**Azure Cloud Architecture · Platform Engineering · Landing Zones · Governance · Terraform · Security · System Integration**
 
-Sprints 1–7 are completed. Sprint 8 extends and validates the frozen enterprise architecture without redesigning it.
+It combines enterprise architecture practices with my background in **system integration and architecture of complex automotive systems**.
 
-### Progress Overview
-
-| Sprint | Focus | Status |
-|---|---|:---:|
-| Sprint 1 | Business & Strategy | ✅ Completed |
-| Sprint 2 | Governance | ✅ Completed |
-| Sprint 3 | Architecture Decision Records | ✅ Completed |
-| Sprint 4 | Enterprise Reference Architectures | ✅ Completed |
-| Sprint 5 | Terraform Foundation | ✅ Completed |
-| Sprint 6 | Platform Foundation & Governance | ✅ Completed |
-| Sprint 7 | Landing Zones | ✅ Completed |
-| Sprint 8 | Connectivity / Integration | 🔄 In Progress |
-
-### Current Release
-
-**v0.7.0 — Sprint 7 - Landing Zones**
-
-### Target Release
-
-**v0.8.0 — Sprint 8 - Connectivity / Integration**
-
-### Completed Deliverables
-
-| Domain | Deliverables | Status |
-|---|---|:---:|
-| Business | Enterprise Profile, Business Requirements | ✅ |
-| Strategy | Cloud Strategy | ✅ |
-| Architecture | Architecture Principles, High-Level Architecture, Enterprise Reference Architecture | ✅ |
-| Governance | Governance Framework, Management Groups, Naming & Tagging Standards, Azure Policy guardrails | ✅ |
-| Decisions | ADR-001 → ADR-010 | ✅ |
-| Reference | Enterprise Landing Zone, Connectivity, and Platform Services reference architectures | ✅ |
-| Terraform | Foundation, remote state, repository architecture, platform, Landing Zones, reusable modules, environment structure, bootstrap | ✅ |
-| Platform | Management, Connectivity, Security, Operations, Identity | ✅ |
-| Landing Zones | Corp, Online, Sandbox workload boundaries and Terraform roots | ✅ |
-| Sprint 8 | Connectivity architecture, integration patterns, governance, validation and release readiness | 🔄 |
+The implementation is intentionally **production-inspired**, not a claim of production deployment.
 
 ---
 
-# Project Roadmap
+## Disclaimer
 
-## Sprint 1 — Business & Strategy ✅
+**Mandara Global** and the **OneCloud 2030** transformation program are fictional and created exclusively for educational and portfolio purposes.
 
-- Enterprise Profile
-- Business Requirements
-- Cloud Strategy
-- Architecture Principles
-- High-Level Architecture
-- Enterprise Reference Architecture
-
----
-
-## Sprint 2 — Governance ✅
-
-- Governance Framework
-- Management Group Hierarchy
-- Subscription Strategy
-- Naming Convention Standard
-- Tagging Strategy
-- Governance Documentation
-
----
-
-## Sprint 3 — Architecture Decision Records ✅
-
-- ADR-001 Enterprise Landing Zone Architecture
-- ADR-002 Hub & Spoke Network Architecture
-- ADR-003 Terraform as Infrastructure as Code
-- ADR-004 Enterprise Management Group Hierarchy
-- ADR-005 Private Networking Strategy
-- ADR-006 Enterprise Identity Strategy
-- ADR-007 Enterprise Monitoring & Observability Strategy
-- ADR-008 Enterprise Security Baseline
-- ADR-009 Enterprise Naming Convention Standard
-- ADR-010 Enterprise Tagging Strategy
-
----
-
-## Sprint 4 — Enterprise Reference Architectures ✅
-
-- Enterprise Landing Zone Reference Architecture
-- Enterprise Connectivity Reference Architecture
-- Enterprise Platform Services Reference Architecture
-
----
-
-## Sprint 5 — Terraform Foundation ✅
-
-- Terraform foundation
-- Remote state
-- Repository architecture
-- Platform structure
-- Landing Zone structure
-- Reusable modules
-- Environment and deployment structure
-- Terraform bootstrap
-
----
-
-## Sprint 6 — Platform Foundation & Governance ✅
-
-- Management capability
-- Connectivity capability
-- Security capability
-- Operations capability
-- Identity capability
-- Reusable policy module
-- Allowed Locations policy
-- Required Tags policy
-- Subscription-level policy assignments
-- Terraform validation and clean plan
-- Terraform foundation documentation
-
-### Release
-
-**v0.6.0 — Sprint 6 - Platform Foundation & Governance**
-
----
-
-## Sprint 7 — Landing Zones ✅
-
-- Landing Zone architecture
-- Corp Landing Zone
-- Online Landing Zone
-- Sandbox Landing Zone
-- Landing Zone governance
-- Workload boundary model
-- Terraform Landing Zone implementation
-
-### Release
-
-**v0.7.0 — Sprint 7 - Landing Zones**
-
----
-
-## Sprint 8 — Connectivity / Integration 🔄
-
-Sprint 8 extends the frozen enterprise architecture without introducing an architectural redesign.
-
-### Connectivity Architecture
-
-- Hub & Spoke connectivity validation
-- VNet and subnet model
-- Inter-Landing Zone connectivity patterns
-- Routing and traffic-path principles
-- Internet ingress and egress
-- Connectivity security boundaries
-
-### Hybrid Connectivity
-
-- VPN connectivity pattern
-- ExpressRoute connectivity pattern
-- Hybrid routing
-- Hybrid DNS
-
-### Private Connectivity
-
-- Private Endpoint
-- Private DNS
-- Service Endpoint as an alternative where appropriate
-- Private PaaS access patterns
-
-### Integration Patterns
-
-- Network connectivity
-- Private service connectivity
-- API integration
-- Event-driven integration
-- Messaging patterns
-- Event Hubs, Event Grid and Service Bus decision guidance
-
-### Connectivity Governance
-
-- Platform Team ownership
-- Landing Zone ownership
-- Connectivity request and approval model
-- Connectivity as Code
-- Least privilege and deny-by-default
-- Monitoring and lifecycle management
-
-### Validation & Release Readiness
-
-- Failure scenarios
-- Blast-radius analysis
-- Architecture consistency check
-- Documentation audit
-- Terraform traceability
-- Cross-document consistency
-- Release readiness
-
-### Target Release
-
-**v0.8.0 — Sprint 8 - Connectivity / Integration**
-
----
-
-## Sprint 9 — Security / Governance Hardening
-
-Planned.
-
----
-
-## Sprint 10 — Final Architecture
-
-Planned.
-
----
-
-# Guiding Principles
-
-The foundation is guided by ten architecture principles:
-
-| ID | Principle |
-|---|---|
-| AP-001 | Business Before Technology |
-| AP-002 | Platform over Projects |
-| AP-003 | Infrastructure as Code |
-| AP-004 | Security by Design |
-| AP-005 | Zero Trust |
-| AP-006 | Automation First |
-| AP-007 | Standardization over Customization |
-| AP-008 | Shared Services First |
-| AP-009 | Observability by Default |
-| AP-010 | AI Ready |
-
-These principles guide architecture and implementation decisions across the foundation.
-
----
-
-# Technology Stack
-
-| Domain | Technologies |
-|---|---|
-| Cloud Platform | Microsoft Azure |
-| Infrastructure as Code | Terraform |
-| Identity | Microsoft Entra ID |
-| Governance | Management Groups, Azure Policy |
-| Networking | Hub & Spoke, Private Link, Private DNS, Azure Firewall |
-| Security | Microsoft Defender for Cloud, Azure Key Vault |
-| Monitoring | Azure Monitor, Log Analytics, Managed Grafana, Microsoft Sentinel |
-| DevOps | GitHub, GitHub Actions |
-
----
-
-# Architecture Decision Records
-
-Architecture decisions are documented as **Architecture Decision Records (ADR)** to provide traceability and a clear rationale for major architectural choices.
-
-The repository contains **10 ADRs** covering the core decisions of the foundation.
-
-| ADR | Decision |
-|---|---|
-| ADR-001 | Enterprise Landing Zone Architecture |
-| ADR-002 | Hub & Spoke Network Architecture |
-| ADR-003 | Terraform as Infrastructure as Code |
-| ADR-004 | Enterprise Management Group Hierarchy |
-| ADR-005 | Private Networking Strategy |
-| ADR-006 | Enterprise Identity Strategy |
-| ADR-007 | Enterprise Monitoring & Observability Strategy |
-| ADR-008 | Enterprise Security Baseline |
-| ADR-009 | Enterprise Naming Convention Standard |
-| ADR-010 | Enterprise Tagging Strategy |
-
-The ADRs document the context, decision, drivers, alternatives, consequences, and relationships relevant to each major decision.
-
----
-
-# Repository Goals
-
-The Azure Enterprise Cloud Foundation demonstrates how an enterprise Azure platform can be designed from business strategy through to Infrastructure as Code.
-
-It aims to showcase:
-
-- Enterprise Architecture
-- Azure Cloud Governance
-- Secure Platform Design
-- Enterprise Networking
-- Infrastructure as Code
-- Platform Engineering
-- Operational Excellence
-- Architectural traceability
-
-The implementation is intentionally **production-inspired**, not a claim of production deployment. The goal is to demonstrate sound enterprise architecture and engineering practices while keeping the solution understandable and maintainable.
-
----
-
-# What's Next
-
-The current phase is **Sprint 8 — Connectivity / Integration**.
-
-Sprint 8 focuses on validating and documenting enterprise connectivity and integration patterns across the established Landing Zones and shared Platform capabilities.
-
-The work builds on the frozen S1–S7 architecture and covers:
-
-- Hub & Spoke connectivity
-- Hybrid connectivity patterns
-- Private PaaS access
-- DNS and name resolution
-- Network and application integration patterns
-- Connectivity governance
-- Failure scenarios and blast-radius validation
-- Documentation and Terraform traceability
-
-The target outcome is **v0.8.0 — Sprint 8 - Connectivity / Integration**.
-
-# Contributing
-
-This repository is primarily a personal learning and portfolio project.
-
-Suggestions, feedback, and discussions about Azure architecture, governance, Infrastructure as Code, and platform engineering are welcome.
-
-If you have ideas for improvements, feel free to open an issue or submit a pull request.
-
----
-
-# License
-
-This project is licensed under the MIT License.
-
-See the **LICENSE** file for more information.
-
----
-
-# Disclaimer
-
-**Mandara Global** and the **OneCloud 2030** transformation program are fictional and have been created exclusively for educational and portfolio purposes.
-
-The architecture presented in this repository is inspired by Microsoft Azure Cloud Adoption Framework, Azure Landing Zone guidance, and enterprise architecture best practices. It does not represent any real organization or production environment.
+The architecture is inspired by Microsoft Azure Cloud Adoption Framework, Azure Landing Zone guidance and enterprise architecture practices. It does not represent any real organization or production environment.
