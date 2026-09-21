@@ -1,6 +1,7 @@
 # Terraform Foundation
 
 This directory contains the Infrastructure as Code (IaC) implementation of the Azure Enterprise Cloud Foundation.
+
 The Terraform codebase follows a layered architecture that separates enterprise orchestration, shared platform capabilities, reusable infrastructure modules, and business Landing Zones.
 
 ## Architecture
@@ -48,7 +49,7 @@ terraform/
 
 ├── backend/                 # Remote state configuration
 ├── environments/            # Environment-specific configuration
-├── landingzones/             # Business workload deployments
+├── landingzones/            # Business workload deployments
 │   ├── corp/
 │   ├── online/
 │   └── sandbox/
@@ -63,7 +64,7 @@ terraform/
 │   ├── private-endpoint/
 │   ├── recovery-services/
 │   ├── resource-group/
-│   ├── role-assignment/
+│   ├── role-assignement/
 │   ├── storage-account/
 │   ├── subnet/
 │   └── virtual-network/
@@ -132,7 +133,7 @@ The Enterprise Connectivity Reference Architecture defines a broader target patt
 | Network Security Groups | Implemented / available | Core security control |
 | Private Endpoint module | Available | Supported pattern |
 | Private Endpoint for platform services | Implemented where required | Supported pattern |
-| Private DNS | Not currently implemented | Reference pattern |
+| Private DNS | Implemented | Reference pattern |
 | VNet Peering | Not currently implemented | Reference pattern |
 | Central routing / UDR | Not currently implemented | Reference pattern |
 | Azure Firewall | Not currently implemented | Reference pattern |
@@ -158,30 +159,33 @@ This distinction prevents the Terraform implementation from becoming over-engine
        Workloads    Workloads    Workloads
 ```
 
-The current Terraform foundation establishes the network boundaries shown above. Advanced connectivity paths such as peering, centralized routing, firewall inspection, private DNS and hybrid connectivity remain governed architectural patterns until a concrete implementation requirement exists.
+The current Terraform foundation establishes the network boundaries shown above. Advanced connectivity paths such as peering, centralized routing, firewall inspection, and hybrid connectivity remain governed architectural patterns until a concrete implementation requirement exists.
 
 ### Private Endpoint and DNS
 
 Private Endpoint support is implemented through the reusable `private-endpoint` module and is used for applicable platform services.
 
-Private DNS is not currently deployed as a Terraform capability. Where a Private Endpoint requires private name resolution, the complete enterprise pattern is:
+Private DNS is implemented for the platform Key Vault Private Endpoint through the corresponding Private DNS zone and VNet link.
+
+Current implementation:
 
 ```text
-Workload / Platform Service
-            │
-            ▼
-    Private Endpoint
-            │
-            ▼
-      Azure PaaS
-            ▲
-            │
-      Private DNS
+Platform Key Vault
+        │
+        ▼
+Private Endpoint
+        │
+        ▼
+Private DNS Zone
+privatelink.vaultcore.azure.net
+        │
+        ▼
+Hub VNet
 ```
 
-Private DNS should therefore not be interpreted as currently deployed merely because Private Endpoint support exists.
+The current implementation provides Private DNS for the platform Key Vault scenario. Broader centralized Private DNS integration for workload services remains an architectural pattern and is introduced when required by the target workload or connectivity scenario.
 
-The placement of a Private Endpoint is determined by the service and workload boundary. Platform-owned services may use platform connectivity infrastructure; workload-specific Private Endpoints should remain aligned with the applicable Landing Zone and governance model.
+The placement of a Private Endpoint is determined by the service and workload boundary. Platform-owned services may use platform connectivity infrastructure; workload-specific Private Endpoints remain aligned with the applicable Landing Zone and governance model.
 
 ## Corp Workload Example
 
@@ -207,6 +211,7 @@ Corp Landing Zone
 ```
 
 The workload VNet uses a `/16` address space, providing room for additional workload subnets as the Landing Zone evolves.
+
 The current `/24` workload subnet provides 256 addresses, with Azure reserving 5 addresses per subnet.
 
 The VM is:
@@ -219,16 +224,23 @@ The VM is:
 - No Public IP
 
 The Corp example demonstrates that Landing Zones are intended to host actual workload infrastructure while shared platform services remain centralized.
+
 Online and Sandbox currently remain foundation-only and can be enriched with workloads when required.
 
 ## Governance
 
-Governance controls are implemented within the Management capability using the reusable `policies` Terraform module.
-The foundation currently enforces:
-- Allowed resource locations
-- Required resource tags
+Governance controls are implemented within the Management capability using reusable Terraform policy modules.
+
+The Security & Governance Baseline is implemented as a subscription-level Azure Policy Initiative containing:
+
+- Allowed resource locations — `Deny`
+- Required resource tags — `Deny`
+- Key Vault diagnostic settings — `DeployIfNotExists`
+
+The initiative uses a SystemAssigned Managed Identity for policy remediation.
 
 Landing Zone resources apply the enterprise tagging model and add a Landing Zone-specific tag.
+
 Required tags currently applied to Landing Zone Resource Groups and workload resources:
 
 ```text
@@ -240,7 +252,16 @@ ManagedBy
 LandingZone
 ```
 
-Policy definitions and subscription-level assignments are managed exclusively through Terraform.
+Policy definitions, the Security & Governance Baseline initiative, and subscription-level assignments are managed exclusively through Terraform.
+
+### Security Governance
+
+The policy assignment identity is granted least-privilege roles for the implemented remediation scenario:
+
+- `Monitoring Contributor` on the Platform Security resource group
+- `Log Analytics Contributor` on the central Log Analytics workspace
+
+The Key Vault `DeployIfNotExists` mechanism was validated during S9. Remediation encountered a conflict with an equivalent diagnostic setting already managed by Terraform. The existing Terraform-managed configuration was retained; no additional custom policy or abstraction was introduced.
 
 ## Connectivity Governance
 
@@ -348,6 +369,7 @@ The private SSH key remains local and is never stored in the repository.
 - Centralized enterprise metadata
 - Consistent resource tagging
 - Governance through policy-as-code
+- Security governance through Azure Policy
 - Independent Landing Zone state
 - Clear separation of platform and workload responsibilities
 - Connectivity governed centrally and delegated within guardrails
@@ -381,10 +403,10 @@ No changes
 ```
 
 The three Landing Zone Resource Groups are deployed successfully.
+
 The Corp Landing Zone has additionally been validated with its VNet, subnet, NSG, NIC, and Linux VM workload.
 
-The Terraform implementation has also been reviewed against the Enterprise Connectivity Reference Architecture. The review confirms that the implemented foundation does not introduce architectural drift or an additional Landing Zone.
-
+The Terraform implementation has also been reviewed against the Enterprise Connectivity Reference Architecture and the S9 Security Governance baseline. The review confirms that the implemented foundation does not introduce architectural drift or an additional Landing Zone.
 
 ## Current Status
 
@@ -395,11 +417,11 @@ The Terraform implementation has also been reviewed against the Enterprise Conne
 | Connectivity Foundation | ✅ |
 | Advanced connectivity patterns | Reference / requirement-driven |
 | Security | ✅ |
+| Security / Governance Hardening | ✅ |
 | Operations | ✅ |
 | Identity | ✅ |
 | Landing Zones | ✅ |
 | Corp workload infrastructure | ✅ |
-
 
 ## Architecture Alignment
 
@@ -424,6 +446,8 @@ Platform
  Workloads / Workload-specific Infrastructure
 ```
 
-Terraform implements the foundation and reusable capabilities. Enterprise connectivity features that require a concrete workload or hybrid requirement remain architectural patterns until intentionally introduced through the normal governance and IaC lifecycle.
+Terraform implements the foundation and reusable capabilities.
+
+Enterprise connectivity features that require a concrete workload or hybrid requirement remain architectural patterns until intentionally introduced through the normal governance and IaC lifecycle.
 
 This approach preserves the frozen architecture while avoiding unnecessary infrastructure deployment.

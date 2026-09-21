@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram name="03 - Workload Integration Boundary" id="0">
+    <mxGraphModel dx="1362" dy="901" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="fb674f6e-beaa-473f-96f2-e976c40d9899" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="Enterprise Foundation" vertex="1">
+          <mxGeometry height="90" width="300" x="70" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="9fdbbf91-f6f5-4080-b592-ede8259b9eaf" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Approved Landing Zone" vertex="1">
+          <mxGeometry height="90" width="300" x="470" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bba64b27-c07a-4481-9c7a-ede09089c576" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Workload" vertex="1">
+          <mxGeometry height="90" width="300" x="870" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3c76d08a-cab6-4a1c-adc8-9d8863acecbb" edge="1" parent="1" source="fb674f6e-beaa-473f-96f2-e976c40d9899" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="9fdbbf91-f6f5-4080-b592-ede8259b9eaf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cd4097ad-f76d-4b28-82fe-30aecf8bbe7a" edge="1" parent="1" source="9fdbbf91-f6f5-4080-b592-ede8259b9eaf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="bba64b27-c07a-4481-9c7a-ede09089c576">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d1d532a4-9d29-42b3-b67c-61664fe818b2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Foundation owns&lt;br&gt;Governance / Platform Services" vertex="1">
+          <mxGeometry height="120" width="300" x="70" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="d879860c-77dc-428f-871a-2dc3cae0f40a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Landing Zone owns&lt;br&gt;Workload network Boundary&lt;br&gt;Workload Resource organization" vertex="1">
+          <mxGeometry height="120" width="300" x="470" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="dafed523-2fb5-46d4-9947-e733897813e7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Workload owns&lt;br&gt;Application Resources&lt;br&gt;Configuration / Data" vertex="1">
+          <mxGeometry height="120" width="300" x="870" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="d0fea2e7-31b4-4478-91c5-86e88b06c2fd" edge="1" parent="1" source="fb674f6e-beaa-473f-96f2-e976c40d9899" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="d1d532a4-9d29-42b3-b67c-61664fe818b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="88042fe4-5e2b-471e-a49b-a133de7a1739" edge="1" parent="1" source="9fdbbf91-f6f5-4080-b592-ede8259b9eaf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="d879860c-77dc-428f-871a-2dc3cae0f40a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c0c26a50-efe2-4e37-8733-74365ed924a8" edge="1" parent="1" source="bba64b27-c07a-4481-9c7a-ede09089c576" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" target="dafed523-2fb5-46d4-9947-e733897813e7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5faad997-5927-48b7-82d5-adf747ffb57f" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;" value="Integration rule:&lt;br&gt;Workloads consume the established foundation.&lt;br&gt;They do not recreate enterprise platform capabilities." vertex="1">
+          <mxGeometry height="110" width="720" x="260" y="400" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
